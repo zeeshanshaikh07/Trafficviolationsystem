@@ -1,4 +1,5 @@
 import * as React from "react";
+import useInput from "../../hooks/use-input";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
@@ -16,11 +17,90 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 const theme = createTheme();
 
 export default function SignIn() {
-  const [focus, setFocused] = useState(false);
-  const onFocus = () => setFocused(true);
-  const onBlur = () => setFocused(false);
+  const [isMatch, setIsMatch] = useState(false);
+  const {
+    value: username,
+    hasError: usernameError,
+    valueIsValid: usernameIsValid,
+    reset: usernameReset,
+    inputChangeHander: usernameInputChangeHander,
+    inputBlurHandler: usernameInputBlurHandler,
+  } = useInput((value) => value.trim() !== "");
+
+  const {
+    value: fullname,
+    hasError: fullnameError,
+    valueIsValid: fullnameIsValid,
+    reset: fullnameReset,
+    inputChangeHander: fullnameInputChangeHander,
+    inputBlurHandler: fullnameInputBlurHandler,
+  } = useInput((value) => value.trim() !== "");
+
+  const {
+    value: email,
+    hasError: emailError,
+    valueIsValid: emailIsValid,
+    reset: emailReset,
+    inputChangeHander: emailInputChangeHander,
+    inputBlurHandler: emailInputBlurHandler,
+  } = useInput((value) => value.trim().includes("@"));
+
+  const {
+    value: mobileno,
+    hasError: mobilenoError,
+    valueIsValid: mobilenoIsValid,
+    reset: mobilenoReset,
+    inputChangeHander: mobilenoInputChangeHander,
+    inputBlurHandler: mobilenoInputBlurHandler,
+  } = useInput((value) => value.trim().length === 10);
+
+  const {
+    value: dob,
+    hasError: dobError,
+    valueIsValid: dobIsValid,
+    reset: dobReset,
+    inputChangeHander: dobInputChangeHander,
+    inputBlurHandler: dobInputBlurHandler,
+  } = useInput((value) => value.trim() !== "");
+
+  const {
+    value: password,
+    hasError: passwordError,
+    valueIsValid: passwordIsValid,
+    reset: passwordReset,
+    inputChangeHander: passwordInputChangeHander,
+    inputBlurHandler: passwordInputBlurHandler,
+  } = useInput((value) => value.trim().length >= 5);
+
+  const cpasswordInputChangeHander = (event) => {
+    if (event.target.value !== password) {
+      setIsMatch(true);
+    } else {
+      setIsMatch(false);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (
+      !usernameIsValid ||
+      !fullnameIsValid ||
+      !emailIsValid ||
+      !mobilenoIsValid ||
+      !dobIsValid ||
+      !passwordIsValid
+    ) {
+      return;
+    }
+
+    usernameReset();
+    fullnameReset();
+    emailReset();
+    mobilenoReset();
+    dobReset();
+    passwordReset();
+
     const data = new FormData(event.currentTarget);
     console.log({
       username: data.get("username"),
@@ -75,6 +155,11 @@ export default function SignIn() {
               sx={{ mt: 1 }}
             >
               <TextField
+                value={username}
+                onChange={usernameInputChangeHander}
+                onBlur={usernameInputBlurHandler}
+                error={usernameError}
+                helperText={usernameError ? "Please enter username!" : " "}
                 margin="normal"
                 required
                 fullWidth
@@ -86,6 +171,11 @@ export default function SignIn() {
                 autoFocus
               />
               <TextField
+                value={fullname}
+                onChange={fullnameInputChangeHander}
+                onBlur={fullnameInputBlurHandler}
+                error={fullnameError}
+                helperText={fullnameError ? "Please enter full name!" : " "}
                 margin="normal"
                 required
                 fullWidth
@@ -96,6 +186,13 @@ export default function SignIn() {
                 autoComplete="fullname"
               />
               <TextField
+                value={email}
+                onChange={emailInputChangeHander}
+                onBlur={emailInputBlurHandler}
+                error={emailError}
+                helperText={
+                  emailError ? "Please enter a valid email address!" : " "
+                }
                 margin="normal"
                 required
                 fullWidth
@@ -107,6 +204,13 @@ export default function SignIn() {
               />
 
               <TextField
+                value={mobileno}
+                onChange={mobilenoInputChangeHander}
+                onBlur={mobilenoInputBlurHandler}
+                error={mobilenoError}
+                helperText={
+                  mobilenoError ? "Please enter valid mobile number!" : " "
+                }
                 margin="normal"
                 required
                 fullWidth
@@ -117,16 +221,29 @@ export default function SignIn() {
                 autoComplete="mobileno"
               />
               <TextField
+                InputLabelProps={{ shrink: true }}
+                value={dob}
+                onChange={dobInputChangeHander}
+                onBlur={dobInputBlurHandler}
+                error={dobError}
+                helperText={dobError ? "Please enter date of birth!" : " "}
                 margin="normal"
                 required
                 fullWidth
-                onFocus={onFocus}
-                onBlur={onBlur}
                 label="DOB"
                 name="dob"
-                type={focus ? "date" : "text"}
+                type="date"
               />
               <TextField
+                value={password}
+                onChange={passwordInputChangeHander}
+                onBlur={passwordInputBlurHandler}
+                error={passwordError}
+                helperText={
+                  passwordError
+                    ? "Please enter password of atleast 5 characters!"
+                    : " "
+                }
                 margin="normal"
                 required
                 fullWidth
@@ -137,6 +254,9 @@ export default function SignIn() {
                 autoComplete="current-password"
               />
               <TextField
+                onChange={cpasswordInputChangeHander}
+                error={isMatch}
+                helperText={isMatch ? "Password do not matched!" : " "}
                 margin="normal"
                 required
                 fullWidth

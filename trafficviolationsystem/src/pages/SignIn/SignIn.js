@@ -1,5 +1,5 @@
-import useInput from "../../hooks/use-input";
 import { Link } from "react-router-dom";
+import useInput from "../../hooks/use-input";
 import { Fragment } from "react";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Button from "@mui/material/Button";
@@ -33,7 +33,7 @@ export default function SignIn() {
     reset: passwordReset,
     inputChangeHander: passwordInputChangeHander,
     inputBlurHandler: passwordInputBlurHandler,
-  } = useInput((value) => value.trim().length >= 5);
+  } = useInput((value) => value.trim() !== "");
 
   // let formIsValid = false;
 
@@ -121,11 +121,7 @@ export default function SignIn() {
                 onChange={passwordInputChangeHander}
                 onBlur={passwordInputBlurHandler}
                 error={passwordError}
-                helperText={
-                  passwordError
-                    ? "Please enter password atleast 5 characters!"
-                    : " "
-                }
+                helperText={passwordError ? "Please enter password!" : " "}
                 margin="normal"
                 required
                 fullWidth
