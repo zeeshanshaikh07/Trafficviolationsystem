@@ -1,0 +1,31 @@
+.signin{
+    border: 2px solid #313082;
+    border-radius: 20px;
+   
+}
+
+.btn{
+    border-radius: 10px !important;
+    background-color: #313082 !important;
+    color: #fff !important;
+}
+
+.auth_title{
+    color: #313082;
+}
+
+.activeClass{
+    /* background-color: #313082; */
+    color: #313082;
+    /* padding:5px 10px;
+    border-radius:5px; */
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 700;
+}
+
+.notActiveClass{
+    text-decoration: none;
+    color: #000;
+    margin-left: 1.5rem;
+}
