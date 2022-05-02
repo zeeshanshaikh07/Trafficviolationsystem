@@ -1,8 +1,0 @@
-# filename: config.toml
-[database]
-host = "localhost"
-port = ":8000"
-database = "tvs"
-user = "root"
-password = ""
-
