@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// -------------------------------------- ENTITIES --------------------------------------
 type User struct {
 	Userid    uint64 `gorm:"primary_key:auto_increment" json:"userid"`
 	Roleid    uint64 `gorm:"type:bigint(11)" json:"roleid"`
@@ -17,13 +18,33 @@ type User struct {
 	Token     string `gorm:"-" json:"token,omitempty"`
 }
 
+type Address struct {
+	Addressid   uint64 `gorm:"primary_key:auto_increment" json:"addressid"`
+	Userid      uint64 `gorm:"type:bigint(11)" json:"userid"`
+	Addresstype string `gorm:"type:varchar(30)" json:"addresstype"`
+	Houseno     string `gorm:"type:varchar(30)" json:"houseno"`
+	Areaname    string `gorm:"type:varchar(30)" json:"areaname"`
+	Pincode     string `gorm:"type:varchar(30)" json:"pincode"`
+	City        string `gorm:"type:varchar(30)" json:"city"`
+	State       string `gorm:"type:varchar(30)" json:"state"`
+}
+
+type Uservehicles struct {
+	Uservehicleid uint64 `gorm:"primary_key:auto_increment" json:"uservehicleid"`
+	Userid        uint64 `gorm:"type:bigint(11)" json:"userid"`
+	Regno         string `gorm:"type:varchar(30)" json:"regno"`
+	Chassisno     string `gorm:"type:varchar(30)" json:"chassisno"`
+}
+
+// -------------------------------------- DTOS --------------------------------------
+
 type LoginDTO struct {
 	Loginid  string `json:"loginid" form:"username" binding:"required"`
 	Password string `json:"password" form:"password" binding:"required"`
 }
 
 type RegisterDTO struct {
-	Roleid    uint64 `json:"roleid" form:"roleid" binding:"required"`
+	Roleid    uint64 `json:"roleid,omitempty" form:"roleid"`
 	Loginid   string `json:"loginid" form:"loginid" binding:"required"`
 	Fullname  string `json:"fullname" form:"fullname" binding:"required"`
 	Createdby uint64 `json:"createdby" form:"createdby"`
@@ -33,11 +54,20 @@ type RegisterDTO struct {
 	Password  string `json:"password" form:"password" binding:"required"`
 }
 
+type UservehiclesDTO struct {
+	Userid    uint64 `json:"userid,omitempty" form:"userid,omitempty"`
+	Regno     string `json:"regno" form:"regno" binding:"required"`
+	Chassisno string `json:"chassisno" form:"chassisno" binding:"required"`
+}
+
+// -------------------------------------- INTERFACES --------------------------------------
 type UserService interface {
 	RegisterUser(user RegisterDTO) User
 	VerifyCredential(emailid string, password string) interface{}
 	IsDuplicateEmail(emailid string) bool
 	IsDuplicateUsername(loginid string) bool
+	IsDuplicateVehicleRegNo(vehregno string) bool
+	AddVehicle(vehicle UservehiclesDTO) Uservehicles
 }
 
 type UserRepository interface {
@@ -45,4 +75,6 @@ type UserRepository interface {
 	VerifyCredential(emailid string, password string) interface{}
 	IsDuplicateEmail(emailid string) (tx *gorm.DB)
 	IsDuplicateUsername(loginid string) (tx *gorm.DB)
+	IsDuplicateVehicleRegNo(vehregno string) (tx *gorm.DB)
+	AddVehicle(vehicle Uservehicles) Uservehicles
 }

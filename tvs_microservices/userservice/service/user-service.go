@@ -55,7 +55,23 @@ func (service *userService) IsDuplicateUsername(loginid string) bool {
 	res := service.userRepository.IsDuplicateUsername(loginid)
 	return !(res.Error == nil)
 }
+
 func (service *userService) IsDuplicateEmail(emailid string) bool {
 	res := service.userRepository.IsDuplicateEmail(emailid)
 	return !(res.Error == nil)
+}
+
+func (service *userService) IsDuplicateVehicleRegNo(vehregno string) bool {
+	res := service.userRepository.IsDuplicateVehicleRegNo(vehregno)
+	return !(res.Error == nil)
+}
+
+func (service *userService) AddVehicle(vehicle model.UservehiclesDTO) model.Uservehicles {
+	userVehicle := model.Uservehicles{}
+	err := smapping.FillStruct(&userVehicle, smapping.MapFields(&vehicle))
+	if err != nil {
+		log.Fatalf("Failed map %v", err)
+	}
+	res := service.userRepository.AddVehicle(userVehicle)
+	return res
 }

@@ -1,33 +1,20 @@
 package utils
 
-import "strings"
-
 type Response struct {
-	Status  bool        `json:"status"`
-	Message string      `json:"message"`
-	Errors  interface{} `json:"errors"`
-	Data    interface{} `json:"data"`
+	Error_message string      `json:"error_message"`
+	Error_code    int         `json:"error_code"`
+	Data          interface{} `json:"data"`
 }
 
 type EmptyObj struct{}
 
-func BuildSuccessResponse(status bool, message string, data interface{}) Response {
-	res := Response{
-		Status:  status,
-		Message: message,
-		Errors:  nil,
-		Data:    data,
-	}
-	return res
-}
+func BuildResponse(message string, code int, data interface{}) Response {
 
-func BuildErrorResponse(message string, err string, data interface{}) Response {
-	errVal := strings.Split(err, "\n")
 	res := Response{
-		Status:  false,
-		Message: message,
-		Errors:  errVal,
-		Data:    data,
+
+		Error_message: message,
+		Error_code:    code,
+		Data:          data,
 	}
 	return res
 }

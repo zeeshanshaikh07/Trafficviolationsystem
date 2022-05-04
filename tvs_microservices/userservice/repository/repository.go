@@ -45,6 +45,16 @@ func (db *userConnection) IsDuplicateUsername(loginid string) (tx *gorm.DB) {
 	return db.connection.Where("loginid = ?", loginid).Take(&user)
 }
 
+func (db *userConnection) AddVehicle(vehicle model.Uservehicles) model.Uservehicles {
+	db.connection.Save(&vehicle)
+	return vehicle
+}
+
+func (db *userConnection) IsDuplicateVehicleRegNo(vehregno string) (tx *gorm.DB) {
+	var vehicle model.Uservehicles
+	return db.connection.Where("regno = ?", vehregno).Take(&vehicle)
+}
+
 func hashAndSalt(pwd []byte) string {
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {

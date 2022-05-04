@@ -25,10 +25,11 @@ func HandleAuthRequests(r *gin.Engine, db *gorm.DB) {
 		})
 	})
 
-	authRoutes := r.Group("api/v1/users")
+	routes := r.Group("api/v1/users")
 	{
-		authRoutes.POST("/login", userController.Login)
-		authRoutes.POST("/register", userController.Register)
+		routes.POST("/", userController.Register)
+		routes.POST("/login", userController.Login)
+		routes.POST("/vehicles", userController.AddVehicle)
 	}
 
 }
