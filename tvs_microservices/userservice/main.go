@@ -18,7 +18,7 @@ func initializeDbAndRoutes(r *gin.Engine) {
 	routes.HandleAuthRequests(r, db)
 
 	conf := utils.NewConfig()
-	PORT := conf.Database.Port
+	PORT := conf.Server.Port
 	r.Run(PORT)
 }
 
