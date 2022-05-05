@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"trafficviolationsystem/userservice/model"
-	"trafficviolationsystem/userservice/service"
+
 	"trafficviolationsystem/userservice/utils"
 
 	"github.com/dgrijalva/jwt-go"
@@ -15,13 +15,13 @@ import (
 
 type userController struct {
 	userService model.UserService
-	jwtService  service.JWTService
+	jwt         utils.JWT
 }
 
-func NewUserController(userService model.UserService, jwtService service.JWTService) *userController {
+func NewUserController(userService model.UserService, jwtToken utils.JWT) *userController {
 	return &userController{
 		userService: userService,
-		jwtService:  jwtService,
+		jwt:         jwtToken,
 	}
 }
 
@@ -35,7 +35,7 @@ func (c *userController) Login(ctx *gin.Context) {
 	}
 	userResult := c.userService.VerifyCredential(loginDTO.Loginid, loginDTO.Password)
 	if v, ok := userResult.(model.User); ok {
-		generatedToken := c.jwtService.GenerateToken(strconv.FormatUint(v.Userid, 10))
+		generatedToken := c.jwt.GenerateToken(strconv.FormatUint(v.Userid, 10))
 		v.Token = generatedToken
 		response := utils.BuildResponse("Login Successful!", 200, v)
 		ctx.JSON(http.StatusOK, response)
@@ -63,7 +63,7 @@ func (c *userController) Register(ctx *gin.Context) {
 	} else {
 		fmt.Printf("%#v\n", registerDTO)
 		createdUser := c.userService.RegisterUser(registerDTO)
-		token := c.jwtService.GenerateToken(strconv.FormatUint(createdUser.Userid, 10))
+		token := c.jwt.GenerateToken(strconv.FormatUint(createdUser.Userid, 10))
 		createdUser.Token = token
 		response := utils.BuildResponse("Registration Successful!", 201, createdUser)
 		ctx.JSON(http.StatusCreated, response)
@@ -81,23 +81,21 @@ func (c *userController) AddVehicle(context *gin.Context) {
 		context.JSON(http.StatusConflict, response)
 	} else {
 		authHeader := context.GetHeader("Authorization")
-		userid := c.getUseridByToken(authHeader)
-		convertedUserid, err := strconv.ParseUint(userid, 10, 64)
+		token, errToken := c.jwt.ValidateToken(authHeader)
+		if errToken != nil {
+			panic(errToken.Error())
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
+		if err != nil {
+			panic(err.Error())
+		}
+
 		if err == nil {
-			userVehicleDTO.Userid = convertedUserid
+			userVehicleDTO.Userid = userid
 		}
 		result := c.userService.AddVehicle(userVehicleDTO)
 		response := utils.BuildResponse("Vehicle added successfully!", 201, result)
 		context.JSON(http.StatusCreated, response)
 	}
-}
-
-func (c *userController) getUseridByToken(token string) string {
-	aToken, err := c.jwtService.ValidateToken(token)
-	if err != nil {
-		panic(err.Error())
-	}
-	claims := aToken.Claims.(jwt.MapClaims)
-	id := fmt.Sprintf("%v", claims["userid"])
-	return id
 }

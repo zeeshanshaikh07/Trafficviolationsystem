@@ -10,9 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupDBConnection() *gorm.DB {
+func SetupDBConnection(conf *utils.Config) *gorm.DB {
 
-	conf := utils.NewConfig() //Initialize config
 	dbUser := conf.Database.User
 	dbPass := conf.Database.Password
 	dbName := conf.Database.Database

@@ -1,15 +1,13 @@
-package service
+package utils
 
 import (
 	"fmt"
 	"time"
 
-	"trafficviolationsystem/userservice/utils"
-
 	"github.com/dgrijalva/jwt-go"
 )
 
-type JWTService interface {
+type JWT interface {
 	GenerateToken(Userid string) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
@@ -19,20 +17,20 @@ type jwtCustomClaim struct {
 	jwt.StandardClaims
 }
 
-type jwtService struct {
+type jwtToken struct {
 	secretKey string
 	issuer    string
 }
 
-func NewJWTService() JWTService {
-	return &jwtService{
+func NewJWTService() JWT {
+	return &jwtToken{
 		issuer:    "trafficviolationsystem",
 		secretKey: getSecretKey(),
 	}
 }
 
 func getSecretKey() string {
-	conf := utils.NewConfig()
+	conf := NewConfig()
 	secretKey := conf.Database.Secret
 
 	if secretKey != "" {
@@ -41,7 +39,7 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *jwtService) GenerateToken(Userid string) string {
+func (j *jwtToken) GenerateToken(Userid string) string {
 
 	claims := &jwtCustomClaim{
 		Userid,
@@ -59,7 +57,7 @@ func (j *jwtService) GenerateToken(Userid string) string {
 	return t
 }
 
-func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
+func (j *jwtToken) ValidateToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(t_ *jwt.Token) (interface{}, error) {
 		if _, ok := t_.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method %v", t_.Header["alg"])

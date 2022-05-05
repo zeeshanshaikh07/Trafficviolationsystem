@@ -18,7 +18,7 @@ type User struct {
 	Token     string `gorm:"-" json:"token,omitempty"`
 }
 
-type Address struct {
+type Useraddress struct {
 	Addressid   uint64 `gorm:"primary_key:auto_increment" json:"addressid"`
 	Userid      uint64 `gorm:"type:bigint(11)" json:"userid"`
 	Addresstype string `gorm:"type:varchar(30)" json:"addresstype"`
@@ -63,18 +63,18 @@ type UservehiclesDTO struct {
 // -------------------------------------- INTERFACES --------------------------------------
 type UserService interface {
 	RegisterUser(user RegisterDTO) User
-	VerifyCredential(emailid string, password string) interface{}
-	IsDuplicateEmail(emailid string) bool
+	VerifyCredential(loginid string, password string) interface{}
+	IsDuplicateEmail(loginid string) bool
 	IsDuplicateUsername(loginid string) bool
 	IsDuplicateVehicleRegNo(vehregno string) bool
 	AddVehicle(vehicle UservehiclesDTO) Uservehicles
 }
 
 type UserRepository interface {
-	RegisterUser(user User) User
-	VerifyCredential(emailid string, password string) interface{}
-	IsDuplicateEmail(emailid string) (tx *gorm.DB)
-	IsDuplicateUsername(loginid string) (tx *gorm.DB)
-	IsDuplicateVehicleRegNo(vehregno string) (tx *gorm.DB)
+	AddUser(user User) User
+	VerifyCredential(loginid string, password string) interface{}
+	CheckEmail(loginid string) (tx *gorm.DB)
+	CheckUsername(loginid string) (tx *gorm.DB)
+	CheckVehicleRegNo(vehregno string) (tx *gorm.DB)
 	AddVehicle(vehicle Uservehicles) Uservehicles
 }

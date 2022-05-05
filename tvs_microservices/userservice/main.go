@@ -2,6 +2,7 @@ package main
 
 import (
 	"trafficviolationsystem/userservice/config"
+	"trafficviolationsystem/userservice/middleware"
 	"trafficviolationsystem/userservice/routes"
 	"trafficviolationsystem/userservice/utils"
 
@@ -9,15 +10,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func initializeDbAndRoutes(r *gin.Engine) {
+func initialize(r *gin.Engine) {
+	conf := utils.NewConfig()
 	var (
-		db *gorm.DB = config.SetupDBConnection()
+		db *gorm.DB = config.SetupDBConnection(conf)
 	)
 
 	defer config.CloseDBConnection(db)
+	r.Use(middleware.CORS)
+
 	routes.HandleAuthRequests(r, db)
 
-	conf := utils.NewConfig()
 	PORT := conf.Server.Port
 	r.Run(PORT)
 }
@@ -25,6 +28,6 @@ func initializeDbAndRoutes(r *gin.Engine) {
 func main() {
 
 	r := gin.Default()
-	initializeDbAndRoutes(r)
+	initialize(r)
 
 }

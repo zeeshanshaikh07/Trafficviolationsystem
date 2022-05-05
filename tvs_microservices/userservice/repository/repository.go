@@ -19,7 +19,7 @@ func NewUserRepository(db *gorm.DB) *userConnection {
 	}
 }
 
-func (db *userConnection) RegisterUser(user model.User) model.User {
+func (db *userConnection) AddUser(user model.User) model.User {
 	user.Password = hashAndSalt([]byte(user.Password))
 	db.connection.Save(&user)
 	return user
@@ -35,12 +35,12 @@ func (db *userConnection) VerifyCredential(loginid string, password string) inte
 	return nil
 }
 
-func (db *userConnection) IsDuplicateEmail(emailid string) (tx *gorm.DB) {
+func (db *userConnection) CheckEmail(emailid string) (tx *gorm.DB) {
 	var user model.User
 	return db.connection.Where("emailid = ?", emailid).Take(&user)
 }
 
-func (db *userConnection) IsDuplicateUsername(loginid string) (tx *gorm.DB) {
+func (db *userConnection) CheckUsername(loginid string) (tx *gorm.DB) {
 	var user model.User
 	return db.connection.Where("loginid = ?", loginid).Take(&user)
 }
@@ -50,7 +50,7 @@ func (db *userConnection) AddVehicle(vehicle model.Uservehicles) model.Uservehic
 	return vehicle
 }
 
-func (db *userConnection) IsDuplicateVehicleRegNo(vehregno string) (tx *gorm.DB) {
+func (db *userConnection) CheckVehicleRegNo(vehregno string) (tx *gorm.DB) {
 	var vehicle model.Uservehicles
 	return db.connection.Where("regno = ?", vehregno).Take(&vehicle)
 }

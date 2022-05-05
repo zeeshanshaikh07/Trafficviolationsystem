@@ -37,7 +37,7 @@ func (service *userService) RegisterUser(user model.RegisterDTO) model.User {
 	if err != nil {
 		log.Fatalf("Failed map %v", err)
 	}
-	res := service.userRepository.RegisterUser(userToCreate)
+	res := service.userRepository.AddUser(userToCreate)
 	return res
 }
 
@@ -52,17 +52,17 @@ func comparePassword(hashedPwd string, plainPassword []byte) bool {
 }
 
 func (service *userService) IsDuplicateUsername(loginid string) bool {
-	res := service.userRepository.IsDuplicateUsername(loginid)
+	res := service.userRepository.CheckUsername(loginid)
 	return !(res.Error == nil)
 }
 
 func (service *userService) IsDuplicateEmail(emailid string) bool {
-	res := service.userRepository.IsDuplicateEmail(emailid)
+	res := service.userRepository.CheckEmail(emailid)
 	return !(res.Error == nil)
 }
 
 func (service *userService) IsDuplicateVehicleRegNo(vehregno string) bool {
-	res := service.userRepository.IsDuplicateVehicleRegNo(vehregno)
+	res := service.userRepository.CheckVehicleRegNo(vehregno)
 	return !(res.Error == nil)
 }
 
