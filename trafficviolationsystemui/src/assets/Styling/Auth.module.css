@@ -15,10 +15,7 @@
 }
 
 .activeClass{
-    /* background-color: #313082; */
-    color: #313082;
-    /* padding:5px 10px;
-    border-radius:5px; */
+   color: #313082;
     text-decoration: none;
     margin-left: 1.5rem;
     font-weight: 700;

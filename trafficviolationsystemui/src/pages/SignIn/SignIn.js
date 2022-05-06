@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
-import useInput from "../../hooks/use-input";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useState } from "react";
+import { login } from "../../libs/api";
 import { Fragment } from "react";
+import useInput from "../../hooks/use-input";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -12,18 +16,21 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import classes from "../../assets/Styling/Auth.module.css";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
 
 export default function SignIn() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const {
-    value: username,
-    hasError: usernameError,
-    valueIsValid: usernameIsValid,
-    reset: usernameReset,
-    inputChangeHander: usernameInputChangeHander,
-    inputBlurHandler: usernameInputBlurHandler,
+    value: loginid,
+    hasError: loginidError,
+    valueIsValid: loginidIsValid,
+    reset: loginidReset,
+    inputChangeHander: loginidInputChangeHander,
+    inputBlurHandler: loginidInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
 
   const {
@@ -35,33 +42,54 @@ export default function SignIn() {
     inputBlurHandler: passwordInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
 
-  // let formIsValid = false;
-
-  // if (usernameIsValid && passwordIsValid) {
-  //   formIsValid = true;
-  // }
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
-    if (!usernameIsValid || !passwordIsValid) {
+    if (!loginidIsValid || !passwordIsValid) {
+      setIsLoading(false);
       return;
     }
 
-    usernameReset();
+    loginidReset();
     passwordReset();
 
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get("username"),
+
+    const userData = {
+      loginid: data.get("loginid"),
       password: data.get("password"),
-    });
+    };
+
+    await login(userData)
+      .then((res) => {
+        if (res.status_code === 200) {
+          setIsLoading(false);
+          setSuccess(res.message);
+        } else {
+          setIsLoading(false);
+          setError(res.message);
+        }
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
   };
 
   return (
     <Fragment>
       <Topbar>Sign In</Topbar>
       <ThemeProvider theme={theme}>
+        {isLoading && <Alert severity="info">Signing in...</Alert>}
+
+        {!isLoading && success === "" && error !== "" && (
+          <Alert severity="error">{error}</Alert>
+        )}
+
+        {!isLoading && success !== "" && (
+          <Alert severity="success">{success}</Alert>
+        )}
+
         <Container
           sx={{ mt: 3 }}
           className={classes.signin}
@@ -101,18 +129,18 @@ export default function SignIn() {
               sx={{ mt: 1 }}
             >
               <TextField
-                value={username}
-                onChange={usernameInputChangeHander}
-                onBlur={usernameInputBlurHandler}
-                error={usernameError}
-                helperText={usernameError ? "Please enter username!" : " "}
+                value={loginid}
+                onChange={loginidInputChangeHander}
+                onBlur={loginidInputBlurHandler}
+                error={loginidError}
+                helperText={loginidError ? "Please enter username!" : " "}
                 margin="normal"
                 required
                 fullWidth
-                id="username"
+                id="loginid"
                 label="Username"
-                name="username"
-                autoComplete="username"
+                name="loginid"
+                autoComplete="loginid"
                 autoFocus
               />
 
@@ -161,7 +189,6 @@ export default function SignIn() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 className={classes.btn}
-                // disabled={!formIsValid}
               >
                 Sign In
               </Button>

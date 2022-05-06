@@ -1,8 +1,10 @@
-import * as React from "react";
-import useInput from "../../hooks/use-input";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
+import { register } from "../../libs/api";
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
+import useInput from "../../hooks/use-input";
+import Alert from "@mui/material/Alert";
 import Topbar from "../../layouts/Topbar/Topbar";
 import classes from "../../assets/Styling/Auth.module.css";
 import Button from "@mui/material/Button";
@@ -12,44 +14,43 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
 
 export default function SignIn() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const [isMatch, setIsMatch] = useState(false);
   const {
-    value: username,
-    hasError: usernameError,
-    valueIsValid: usernameIsValid,
-    reset: usernameReset,
-    inputChangeHander: usernameInputChangeHander,
-    inputBlurHandler: usernameInputBlurHandler,
+    value: loginid,
+    hasError: loginidError,
+    valueIsValid: loginidIsValid,
+    inputChangeHander: loginidInputChangeHander,
+    inputBlurHandler: loginidInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
 
   const {
     value: fullname,
     hasError: fullnameError,
     valueIsValid: fullnameIsValid,
-    reset: fullnameReset,
     inputChangeHander: fullnameInputChangeHander,
     inputBlurHandler: fullnameInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
 
   const {
-    value: email,
-    hasError: emailError,
-    valueIsValid: emailIsValid,
-    reset: emailReset,
-    inputChangeHander: emailInputChangeHander,
-    inputBlurHandler: emailInputBlurHandler,
+    value: emailid,
+    hasError: emailidError,
+    valueIsValid: emailidIsValid,
+    inputChangeHander: emailidInputChangeHander,
+    inputBlurHandler: emailidInputBlurHandler,
   } = useInput((value) => value.trim().includes("@"));
 
   const {
     value: mobileno,
     hasError: mobilenoError,
     valueIsValid: mobilenoIsValid,
-    reset: mobilenoReset,
     inputChangeHander: mobilenoInputChangeHander,
     inputBlurHandler: mobilenoInputBlurHandler,
   } = useInput((value) => value.trim().length === 10);
@@ -58,7 +59,6 @@ export default function SignIn() {
     value: dob,
     hasError: dobError,
     valueIsValid: dobIsValid,
-    reset: dobReset,
     inputChangeHander: dobInputChangeHander,
     inputBlurHandler: dobInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
@@ -67,7 +67,6 @@ export default function SignIn() {
     value: password,
     hasError: passwordError,
     valueIsValid: passwordIsValid,
-    reset: passwordReset,
     inputChangeHander: passwordInputChangeHander,
     inputBlurHandler: passwordInputBlurHandler,
   } = useInput((value) => value.trim().length >= 5);
@@ -80,42 +79,65 @@ export default function SignIn() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
     if (
-      !usernameIsValid ||
+      !loginidIsValid ||
       !fullnameIsValid ||
-      !emailIsValid ||
+      !emailidIsValid ||
       !mobilenoIsValid ||
       !dobIsValid ||
       !passwordIsValid
     ) {
+      setIsLoading(false);
+
       return;
     }
 
-    usernameReset();
-    fullnameReset();
-    emailReset();
-    mobilenoReset();
-    dobReset();
-    passwordReset();
-
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get("username"),
+
+    const userData = {
+      roleid: 3,
+      loginid: data.get("loginid"),
       fullname: data.get("fullname"),
-      email: data.get("email"),
+      createdby: null,
+      emailid: data.get("emailid"),
       mobileno: data.get("mobileno"),
       dob: data.get("dob"),
       password: data.get("password"),
-    });
+    };
+
+    await register(userData)
+      .then((res) => {
+        window.scrollTo(0, 0);
+        if (res.status_code === 200 || res.status_code === 201) {
+          setIsLoading(false);
+          setSuccess(res.message);
+        } else {
+          setIsLoading(false);
+          setError(res.message);
+        }
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
   };
 
   return (
     <Fragment>
       <Topbar>Sign Up</Topbar>
       <ThemeProvider theme={theme}>
+        {isLoading && <Alert severity="info">Signing in...</Alert>}
+
+        {!isLoading && success === "" && error !== "" && (
+          <Alert severity="error">{error}</Alert>
+        )}
+
+        {!isLoading && success !== "" && (
+          <Alert severity="success">{success}</Alert>
+        )}
         <Container
           className={classes.signin}
           sx={{ mt: 3, mb: 3 }}
@@ -155,19 +177,19 @@ export default function SignIn() {
               sx={{ mt: 1 }}
             >
               <TextField
-                value={username}
-                onChange={usernameInputChangeHander}
-                onBlur={usernameInputBlurHandler}
-                error={usernameError}
-                helperText={usernameError ? "Please enter username!" : " "}
+                value={loginid}
+                onChange={loginidInputChangeHander}
+                onBlur={loginidInputBlurHandler}
+                error={loginidError}
+                helperText={loginidError ? "Please enter username!" : " "}
                 margin="normal"
                 required
                 fullWidth
-                id="username"
+                id="loginid"
                 label="Username"
                 type="text"
-                name="username"
-                autoComplete="username"
+                name="loginid"
+                autoComplete="loginid"
                 autoFocus
               />
               <TextField
@@ -186,21 +208,21 @@ export default function SignIn() {
                 autoComplete="fullname"
               />
               <TextField
-                value={email}
-                onChange={emailInputChangeHander}
-                onBlur={emailInputBlurHandler}
-                error={emailError}
+                value={emailid}
+                onChange={emailidInputChangeHander}
+                onBlur={emailidInputBlurHandler}
+                error={emailidError}
                 helperText={
-                  emailError ? "Please enter a valid email address!" : " "
+                  emailidError ? "Please enter a valid email address!" : " "
                 }
                 margin="normal"
                 required
                 fullWidth
-                name="email"
+                name="emailid"
                 label="Email address"
-                type="email"
-                id="email"
-                autoComplete="email"
+                type="emailid"
+                id="emailid"
+                autoComplete="emailid"
               />
 
               <TextField
