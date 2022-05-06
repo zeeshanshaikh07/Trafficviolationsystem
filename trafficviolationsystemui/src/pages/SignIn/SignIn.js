@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import useInput from "../../hooks/use-input";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import { login } from "../../libs/api";
 import { Fragment } from "react";
+import useInput from "../../hooks/use-input";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -16,14 +16,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import classes from "../../assets/Styling/Auth.module.css";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme();
 
 export default function SignIn() {
-  const [isSigning, setIsSigning] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const {
     value: loginid,
@@ -45,11 +44,10 @@ export default function SignIn() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setIsSigning(true);
+    setIsLoading(true);
 
     if (!loginidIsValid || !passwordIsValid) {
-      setIsSigning(false);
-      setIsSuccess(false);
+      setIsLoading(false);
       return;
     }
 
@@ -57,10 +55,6 @@ export default function SignIn() {
     passwordReset();
 
     const data = new FormData(event.currentTarget);
-    console.log({
-      loginid: data.get("loginid"),
-      password: data.get("password"),
-    });
 
     const userData = {
       loginid: data.get("loginid"),
@@ -69,17 +63,15 @@ export default function SignIn() {
 
     await login(userData)
       .then((res) => {
-        console.log(res);
         if (res.status_code === 200) {
-          setIsSuccess(true);
+          setIsLoading(false);
+          setSuccess(res.message);
         } else {
-          setIsSigning(false);
+          setIsLoading(false);
           setError(res.message);
         }
-        setIsSigning(false);
       })
       .catch((error) => {
-        console.log(error.message);
         setError(error.message);
       });
   };
@@ -88,15 +80,16 @@ export default function SignIn() {
     <Fragment>
       <Topbar>Sign In</Topbar>
       <ThemeProvider theme={theme}>
-        <Stack sx={{ width: "100%" }} spacing={2}>
-          {isSigning && <Alert severity="info">Signing in...</Alert>}
-          {!isSigning && !isSuccess && error && (
-            <Alert severity="error">{error}</Alert>
-          )}
-          {!isSigning && isSuccess && (
-            <Alert severity="success">Login Successful...!</Alert>
-          )}
-        </Stack>
+        {isLoading && <Alert severity="info">Signing in...</Alert>}
+
+        {!isLoading && success === "" && error !== "" && (
+          <Alert severity="error">{error}</Alert>
+        )}
+
+        {!isLoading && success !== "" && (
+          <Alert severity="success">{success}</Alert>
+        )}
+
         <Container
           sx={{ mt: 3 }}
           className={classes.signin}

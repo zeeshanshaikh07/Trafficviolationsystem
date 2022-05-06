@@ -3,7 +3,6 @@
 const ROOT_ROUTE = "http://localhost:8000/api/v1/users";
 
 export async function login(userData) {
-  console.log(JSON.stringify(userData));
   const response = await fetch(`${ROOT_ROUTE}/login`, {
     method: "POST",
     body: JSON.stringify(userData),
@@ -22,7 +21,6 @@ export async function login(userData) {
 }
 
 export async function register(userData) {
-  console.log(JSON.stringify(userData));
   const response = await fetch(`${ROOT_ROUTE}/`, {
     method: "POST",
     body: JSON.stringify(userData),
@@ -36,7 +34,6 @@ export async function register(userData) {
 }
 
 export async function addVehicle(vehicleData) {
-  console.log(JSON.stringify(vehicleData));
   const response = await fetch(`${ROOT_ROUTE}/vehicles`, {
     method: "POST",
     body: JSON.stringify(vehicleData),

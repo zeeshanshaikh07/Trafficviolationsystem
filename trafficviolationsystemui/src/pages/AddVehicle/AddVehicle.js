@@ -1,4 +1,7 @@
 import { Fragment } from "react";
+import { addVehicle } from "../../libs/api";
+import { useState } from "react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Card from "../../layouts/Card/Card";
 import TextField from "@mui/material/TextField";
@@ -6,19 +9,14 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import useInput from "../../hooks/use-input";
-import { useState } from "react";
 import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-
-import { addVehicle } from "../../libs/api";
 
 const theme = createTheme();
 
 export default function AddVehicle() {
-  const [isAdding, setIsAdding] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const {
     value: vehicleregno,
@@ -39,19 +37,14 @@ export default function AddVehicle() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setIsAdding(true);
+    setIsLoading(true);
 
     if (!vehicleregnoIsValid || !vehiclechassisnoIsValid) {
-      setIsAdding(false);
-      setIsSuccess(false);
+      setIsLoading(false);
       return;
     }
 
     const data = new FormData(event.currentTarget);
-    console.log({
-      regno: data.get("vehicleregno"),
-      vehiclechassisno: data.get("vehiclechassisno"),
-    });
 
     const vehicleData = {
       regno: data.get("vehicleregno"),
@@ -60,17 +53,15 @@ export default function AddVehicle() {
 
     await addVehicle(vehicleData)
       .then((res) => {
-        console.log(res);
-        if (res.status_code === 200) {
-          setIsSuccess(true);
+        if (res.status_code === 200 || res.status_code === 201) {
+          setIsLoading(false);
+          setSuccess(res.message);
         } else {
-          setIsAdding(false);
+          setIsLoading(false);
           setError(res.message);
         }
-        setIsAdding(false);
       })
       .catch((error) => {
-        console.log(error.message);
         setError(error.message);
       });
   };
@@ -80,15 +71,14 @@ export default function AddVehicle() {
       <ThemeProvider theme={theme}>
         <Topbar>Add Vehicle</Topbar>
 
-        <Stack sx={{ width: "100%" }} spacing={2}>
-          {isAdding && <Alert severity="info">Signing in...</Alert>}
-          {!isAdding && !isSuccess && error && (
-            <Alert severity="error">{error}</Alert>
-          )}
-          {!isAdding && isSuccess && (
-            <Alert severity="success">Login Successful...!</Alert>
-          )}
-        </Stack>
+        {isLoading && <Alert severity="info">Signing in...</Alert>}
+        {!isLoading && success === "" && error !== "" && (
+          <Alert severity="error">{error}</Alert>
+        )}
+
+        {!isLoading && success !== "" && (
+          <Alert severity="success">{success}</Alert>
+        )}
         <Card>
           <h3>Add your vehicle</h3>
           <Box
