@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
+	_ "gorm.io/gorm"
 	"trafficsystem.com/vehicleregistrationservice/repository"
 	"trafficsystem.com/vehicleregistrationservice/rest"
 	"trafficsystem.com/vehicleregistrationservice/service"
@@ -16,5 +17,9 @@ func HandleRegistrationRequests(r *gin.Engine, db *gorm.DB) {
 
 	fmt.Println("Inside handle request")
 
-	r.GET("/summary", regCtrl.VehicleSummary)
+	basicurl := r.Group("/api/v1/vehicle")
+	basicurl.GET("/registration", regCtrl.VehicleRegistration)
+	basicurl.GET("/insurance", regCtrl.VehicleInsurance)
+	basicurl.GET("/puc", regCtrl.VehiclePuc)
+	basicurl.GET("/:vno", regCtrl.VehicleInfo)
 }
