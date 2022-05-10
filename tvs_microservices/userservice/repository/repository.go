@@ -63,3 +63,21 @@ func hashAndSalt(pwd []byte) string {
 	}
 	return string(hash)
 }
+
+func (db *userConnection) Get(userid uint64) []model.Uservehicles {
+	var userVehicles []model.Uservehicles
+	db.connection.Where("userid = ?", userid).Find(&userVehicles)
+	return userVehicles
+}
+
+func (db *userConnection) Update(vehicle model.Uservehicles) model.Uservehicles {
+
+	db.connection.Save(&vehicle)
+	db.connection.Find(&vehicle)
+
+	return vehicle
+}
+
+func (db *userConnection) Delete(vehicle model.Uservehicles) {
+	db.connection.Delete(&vehicle)
+}

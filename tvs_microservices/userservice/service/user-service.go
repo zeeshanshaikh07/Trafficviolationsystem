@@ -75,3 +75,21 @@ func (service *userService) AddVehicle(vehicle model.UservehiclesDTO) model.User
 	res := service.userRepository.AddVehicle(userVehicle)
 	return res
 }
+
+func (service *userService) GetAllUserVehicles(userid uint64) []model.Uservehicles {
+	return service.userRepository.Get(userid)
+}
+
+func (service *userService) UpdateUserVehicle(vehicle model.UservehiclesupdateDTO) model.Uservehicles {
+	vehicleToUpdate := model.Uservehicles{}
+	err := smapping.FillStruct(&vehicleToUpdate, smapping.MapFields(&vehicle))
+	if err != nil {
+		log.Fatalf("Failed map %v:", err)
+	}
+	updatedVehicle := service.userRepository.Update(vehicleToUpdate)
+	return updatedVehicle
+}
+
+func (service *userService) DeleteUserVehicle(vehicle model.Uservehicles) {
+	service.userRepository.Delete(vehicle)
+}

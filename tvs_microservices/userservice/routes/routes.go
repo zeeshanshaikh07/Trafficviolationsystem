@@ -26,5 +26,8 @@ func HandleAuthRequests(r *gin.Engine, db *gorm.DB) {
 		routes.POST("/", userController.Register)
 		routes.POST("/login", userController.Login)
 		routes.POST("/vehicles", middleware.AuthorizeJWT(jwt), userController.AddVehicle)
+		routes.GET("/vehicles", middleware.AuthorizeJWT(jwt), userController.All)
+		routes.PUT("/vehicles/:vehicleid", middleware.AuthorizeJWT(jwt), userController.UpdateVehicle)
+		routes.DELETE("/vehicles/:vehicleid", middleware.AuthorizeJWT(jwt), userController.DeleteVehicle)
 	}
 }

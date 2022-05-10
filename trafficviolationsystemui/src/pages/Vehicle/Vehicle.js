@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { addVehicle } from "../../libs/api";
 import { useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Vehicles from "../../components/Vehicle/Vehicles";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Card from "../../layouts/Card/Card";
 import TextField from "@mui/material/TextField";
@@ -13,7 +14,7 @@ import Alert from "@mui/material/Alert";
 
 const theme = createTheme();
 
-export default function AddVehicle() {
+export default function Vehicle() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -56,6 +57,9 @@ export default function AddVehicle() {
         if (res.status_code === 200 || res.status_code === 201) {
           setIsLoading(false);
           setSuccess(res.message);
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         } else {
           setIsLoading(false);
           setError(res.message);
@@ -71,7 +75,7 @@ export default function AddVehicle() {
       <ThemeProvider theme={theme}>
         <Topbar>Add Vehicle</Topbar>
 
-        {isLoading && <Alert severity="info">Signing in...</Alert>}
+        {isLoading && <Alert severity="info">Adding...</Alert>}
         {!isLoading && success === "" && error !== "" && (
           <Alert severity="error">{error}</Alert>
         )}
@@ -80,7 +84,7 @@ export default function AddVehicle() {
           <Alert severity="success">{success}</Alert>
         )}
         <Card>
-          <h3>Add your vehicle</h3>
+          <h2>Add new vehicle</h2>
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -95,7 +99,9 @@ export default function AddVehicle() {
                   onBlur={vehicleregnoInputBlurHandler}
                   error={vehicleregnoError}
                   helperText={
-                    vehicleregnoError ? "Please enter username!" : " "
+                    vehicleregnoError
+                      ? "Please enter vehicle registration number!"
+                      : " "
                   }
                   margin="normal"
                   required
@@ -104,7 +110,6 @@ export default function AddVehicle() {
                   label="Vehicle registration number"
                   name="vehicleregno"
                   autoComplete="vehicleregno"
-                  autoFocus
                 />
               </Grid>
               <Grid item xs={4}>
@@ -114,7 +119,9 @@ export default function AddVehicle() {
                   onBlur={vehiclechassisnoInputBlurHandler}
                   error={vehiclechassisnoError}
                   helperText={
-                    vehiclechassisnoError ? "Please enter username!" : " "
+                    vehiclechassisnoError
+                      ? "Please enter vehicle chassic number!"
+                      : " "
                   }
                   margin="normal"
                   required
@@ -135,6 +142,7 @@ export default function AddVehicle() {
                     border: "none",
                     color: "white",
                     padding: "15px 40px",
+                    borderRadius: "20px",
                   }}
                   variant="contained"
                   onSubmit={handleSubmit}
@@ -146,6 +154,7 @@ export default function AddVehicle() {
           </Box>
         </Card>
       </ThemeProvider>
+      <Vehicles />
     </Fragment>
   );
 }

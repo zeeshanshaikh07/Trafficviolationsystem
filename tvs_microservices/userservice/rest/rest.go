@@ -99,3 +99,71 @@ func (c *userController) AddVehicle(context *gin.Context) {
 		context.JSON(http.StatusCreated, response)
 	}
 }
+
+func (c *userController) All(context *gin.Context) {
+	authHeader := context.GetHeader("Authorization")
+	token, errToken := c.jwt.ValidateToken(authHeader)
+	if errToken != nil {
+		panic(errToken.Error())
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
+	if err != nil {
+		panic(err.Error())
+	}
+	var uservehicles []model.Uservehicles = c.userService.GetAllUserVehicles(userid)
+
+	res := utils.BuildResponse("OK", 200, uservehicles)
+	context.JSON(http.StatusOK, res)
+
+}
+
+func (c *userController) UpdateVehicle(context *gin.Context) {
+	var vehicleUpdateDTO model.UservehiclesupdateDTO
+	vehicleId, err := strconv.ParseUint(context.Param("vehicleid"), 0, 0)
+	if err != nil {
+		res := utils.BuildResponse("Vehicle id not found.", 404, utils.EmptyObj{})
+		context.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+	vehicleUpdateDTO.Uservehicleid = vehicleId
+	errDTO := context.ShouldBind(&vehicleUpdateDTO)
+	if errDTO != nil {
+		res := utils.BuildResponse("Failed to process request.", 400, utils.EmptyObj{})
+		context.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+	if !c.userService.IsDuplicateVehicleRegNo(vehicleUpdateDTO.Regno) {
+		response := utils.BuildResponse("This vehicle already exists.", 409, utils.EmptyObj{})
+		context.JSON(http.StatusConflict, response)
+		return
+	}
+
+	authHeader := context.GetHeader("Authorization")
+	token, errToken := c.jwt.ValidateToken(authHeader)
+	if errToken != nil {
+		panic(errToken.Error())
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
+	if err != nil {
+		panic(err.Error())
+	}
+	vehicleUpdateDTO.Userid = userid
+	vehicle := c.userService.UpdateUserVehicle(vehicleUpdateDTO)
+	res := utils.BuildResponse("Vehicle update successfully!", 200, vehicle)
+	context.JSON(http.StatusOK, res)
+}
+
+func (c *userController) DeleteVehicle(context *gin.Context) {
+	var vehicle model.Uservehicles
+	vid, err := strconv.ParseUint(context.Param("vehicleid"), 0, 0)
+	if err != nil {
+		response := utils.BuildResponse("No param id were found", 404, utils.EmptyObj{})
+		context.JSON(http.StatusBadRequest, response)
+	}
+	vehicle.Uservehicleid = vid
+	c.userService.DeleteUserVehicle(vehicle)
+	res := utils.BuildResponse("Vehicle deleted successfully!", 200, utils.EmptyObj{})
+	context.JSON(http.StatusOK, res)
+}
