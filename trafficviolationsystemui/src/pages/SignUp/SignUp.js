@@ -1,6 +1,7 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import { register } from "../../libs/api";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
 import useInput from "../../hooks/use-input";
@@ -21,6 +22,8 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const [isMatch, setIsMatch] = useState(false);
   const {
@@ -112,9 +115,13 @@ export default function SignIn() {
     await register(userData)
       .then((res) => {
         window.scrollTo(0, 0);
-        if (res.status_code === 200 || res.status_code === 201) {
+        if (res.status_code === 201) {
           setIsLoading(false);
           setSuccess(res.message);
+          setTimeout(() => {
+            navigate("/vehicles");
+            window.location.reload();
+          }, 500);
         } else {
           setIsLoading(false);
           setError(res.message);

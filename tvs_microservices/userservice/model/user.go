@@ -69,25 +69,27 @@ type UservehiclesupdateDTO struct {
 
 // -------------------------------------- INTERFACES --------------------------------------
 type UserService interface {
-	RegisterUser(user RegisterDTO) User
+	RegisterUser(user RegisterDTO) (User, error)
 	VerifyCredential(loginid string, password string) interface{}
 	IsDuplicateEmail(loginid string) bool
 	IsDuplicateUsername(loginid string) bool
 	IsDuplicateVehicleRegNo(vehregno string) bool
-	AddVehicle(vehicle UservehiclesDTO) Uservehicles
-	GetAllUserVehicles(userid uint64) []Uservehicles
-	UpdateUserVehicle(UservehiclesupdateDTO) Uservehicles
-	DeleteUserVehicle(vehicle Uservehicles)
+	AddVehicle(vehicle UservehiclesDTO) (Uservehicles, error)
+	GetAllUserVehicles(userid uint64) ([]Uservehicles, error)
+	UpdateUserVehicle(UservehiclesupdateDTO) (Uservehicles, error)
+	DeleteUserVehicle(vehicle Uservehicles) error
+	IsAllowedToUpdateDelete(userid uint64, vehicleid uint64) (bool, error)
 }
 
 type UserRepository interface {
-	AddUser(user User) User
+	AddUser(user User) (User, error)
 	VerifyCredential(loginid string, password string) interface{}
 	CheckEmail(loginid string) (tx *gorm.DB)
 	CheckUsername(loginid string) (tx *gorm.DB)
 	CheckVehicleRegNo(vehregno string) (tx *gorm.DB)
-	AddVehicle(vehicle Uservehicles) Uservehicles
-	Get(userid uint64) []Uservehicles
-	Update(vehicle Uservehicles) Uservehicles
-	Delete(vehicle Uservehicles)
+	AddVehicle(vehicle Uservehicles) (Uservehicles, error)
+	Get(userid uint64) ([]Uservehicles, error)
+	Update(vehicle Uservehicles) (Uservehicles, error)
+	Delete(vehicle Uservehicles) error
+	FindVehicle(vehicleid uint64) (Uservehicles, error)
 }

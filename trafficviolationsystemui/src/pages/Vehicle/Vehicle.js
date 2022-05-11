@@ -54,7 +54,7 @@ export default function Vehicle() {
 
     await addVehicle(vehicleData)
       .then((res) => {
-        if (res.status_code === 200 || res.status_code === 201) {
+        if (res.status_code === 201) {
           setIsLoading(false);
           setSuccess(res.message);
           setTimeout(() => {
