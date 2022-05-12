@@ -9,13 +9,7 @@ import (
 )
 
 type JWTService interface {
-	GenerateToken(authorID string) string
 	ValidateToken(token string) (*jwt.Token, error)
-}
-
-type jwtCustomClaim struct {
-	AuthorID string `json:"author_id"`
-	jwt.StandardClaims
 }
 
 type jwtService struct {
@@ -31,30 +25,11 @@ func NewJWTService() JWTService {
 }
 
 func getSecretKey() string {
-	secretKey := os.Getenv("JWT_SECRET")
+	secretKey := toml.DecodeFile("./infrastructure/config.toml");
 	if secretKey != "" {
 		secretKey = "gogormginjwt"
 	}
 	return secretKey
-}
-
-func (j *jwtService) GenerateToken(AuthorID string) string {
-
-	//passing author id into jwt token
-	claims := &jwtCustomClaim{
-		AuthorID,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().AddDate(1, 0, 0).Unix(),
-			Issuer:    j.issuer,
-			IssuedAt:  time.Now().Unix(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString([]byte(j.secretKey))
-	if err != nil {
-		panic(err)
-	}
-	return t
 }
 
 func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
