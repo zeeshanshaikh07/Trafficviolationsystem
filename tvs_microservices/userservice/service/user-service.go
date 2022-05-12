@@ -93,13 +93,13 @@ func (service *userService) GetAllUserVehicles(userid uint64) ([]model.Uservehic
 	return res, nil
 }
 
-func (service *userService) UpdateUserVehicle(vehicle model.UservehiclesupdateDTO) (model.Uservehicles, error) {
+func (service *userService) UpdateUserVehicle(vehicle model.UservehiclesupdateDTO, vehregno string) (model.Uservehicles, error) {
 	vehicleToUpdate := model.Uservehicles{}
 	err := smapping.FillStruct(&vehicleToUpdate, smapping.MapFields(&vehicle))
 	if err != nil {
 		log.Fatalf("Failed map %v:", err)
 	}
-	updatedVehicle, err := service.userRepository.Update(vehicleToUpdate)
+	updatedVehicle, err := service.userRepository.Update(vehicleToUpdate, vehregno)
 	if err != nil {
 		return updatedVehicle, err
 	}
@@ -114,8 +114,8 @@ func (service *userService) DeleteUserVehicle(vehicle model.Uservehicles) error 
 	return nil
 }
 
-func (service *userService) IsAllowedToUpdateDelete(userid uint64, vehicleid uint64) (bool, error) {
-	vehicle, err := service.userRepository.FindVehicle(vehicleid)
+func (service *userService) IsAllowedToUpdateDelete(userid uint64, vehicleregno string) (bool, error) {
+	vehicle, err := service.userRepository.FindVehicle(vehicleregno)
 	if err != nil {
 		return false, err
 	}

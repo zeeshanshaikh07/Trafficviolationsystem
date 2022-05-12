@@ -61,7 +61,7 @@ type UservehiclesDTO struct {
 }
 
 type UservehiclesupdateDTO struct {
-	Uservehicleid uint64 `json:"uservehicleid" form:"uservehicleid" binding:"required"`
+	Uservehicleid uint64 `json:"uservehicleid,omitempty" form:"uservehicleid,omitempty"`
 	Userid        uint64 `json:"userid,omitempty" form:"userid,omitempty"`
 	Regno         string `json:"regno" form:"regno" binding:"required"`
 	Chassisno     string `json:"chassisno" form:"chassisno" binding:"required"`
@@ -76,9 +76,9 @@ type UserService interface {
 	IsDuplicateVehicleRegNo(vehregno string) bool
 	AddVehicle(vehicle UservehiclesDTO) (Uservehicles, error)
 	GetAllUserVehicles(userid uint64) ([]Uservehicles, error)
-	UpdateUserVehicle(UservehiclesupdateDTO) (Uservehicles, error)
+	UpdateUserVehicle(Uservehicles UservehiclesupdateDTO, vehregno string) (Uservehicles, error)
 	DeleteUserVehicle(vehicle Uservehicles) error
-	IsAllowedToUpdateDelete(userid uint64, vehicleid uint64) (bool, error)
+	IsAllowedToUpdateDelete(userid uint64, vehicleregno string) (bool, error)
 }
 
 type UserRepository interface {
@@ -89,7 +89,7 @@ type UserRepository interface {
 	CheckVehicleRegNo(vehregno string) (tx *gorm.DB)
 	AddVehicle(vehicle Uservehicles) (Uservehicles, error)
 	Get(userid uint64) ([]Uservehicles, error)
-	Update(vehicle Uservehicles) (Uservehicles, error)
+	Update(vehicle Uservehicles, vehregno string) (Uservehicles, error)
 	Delete(vehicle Uservehicles) error
-	FindVehicle(vehicleid uint64) (Uservehicles, error)
+	FindVehicle(vehicleregno string) (Uservehicles, error)
 }

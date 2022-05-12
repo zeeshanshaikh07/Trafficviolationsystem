@@ -157,28 +157,13 @@ func (c *userController) All(context *gin.Context) {
 
 func (c *userController) UpdateVehicle(context *gin.Context) {
 	var vehicleUpdateDTO model.UservehiclesupdateDTO
-	vehicleId, err := strconv.ParseUint(context.Param("vehicleid"), 0, 0)
-	if err != nil {
+	vehicleregno := context.Param("vehicleregno")
+	if vehicleregno == "" {
 		res := utils.NotFound()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
-	vehicleUpdateDTO.Uservehicleid = vehicleId
-	errDTO := context.ShouldBind(&vehicleUpdateDTO)
-	if errDTO != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-		return
-	}
-	if !c.userService.IsDuplicateVehicleRegNo(vehicleUpdateDTO.Regno) {
-		res := utils.Conflict(2)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusConflict, response)
-		return
-	}
-
 	authHeader := context.GetHeader("Authorization")
 	token, errToken := c.jwt.ValidateToken(authHeader)
 	if errToken != nil {
@@ -194,8 +179,22 @@ func (c *userController) UpdateVehicle(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, response)
 	}
 	vehicleUpdateDTO.Userid = userid
+	errDTO := context.ShouldBind(&vehicleUpdateDTO)
+	if errDTO != nil {
+		res := utils.BadRequest()
+		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+		context.JSON(http.StatusBadRequest, response)
+		return
+	}
 
-	result, err := c.userService.IsAllowedToUpdateDelete(vehicleUpdateDTO.Userid, vehicleUpdateDTO.Uservehicleid)
+	if !c.userService.IsDuplicateVehicleRegNo(vehicleUpdateDTO.Regno) {
+		res := utils.Conflict(2)
+		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+		context.JSON(http.StatusConflict, response)
+		return
+	}
+
+	result, err := c.userService.IsAllowedToUpdateDelete(userid, vehicleregno)
 
 	if err != nil {
 		res := utils.BadRequest()
@@ -203,7 +202,7 @@ func (c *userController) UpdateVehicle(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, response)
 	} else {
 		if result {
-			vehicle, err := c.userService.UpdateUserVehicle(vehicleUpdateDTO)
+			vehicle, err := c.userService.UpdateUserVehicle(vehicleUpdateDTO, vehicleregno)
 			if err != nil {
 				res := utils.Failed()
 				response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
@@ -225,13 +224,13 @@ func (c *userController) UpdateVehicle(context *gin.Context) {
 
 func (c *userController) DeleteVehicle(context *gin.Context) {
 	var vehicle model.Uservehicles
-	vid, err := strconv.ParseUint(context.Param("vehicleid"), 0, 0)
-	if err != nil {
+	regno := context.Param("vehicleregno")
+	if regno == "" {
 		res := utils.NotFound()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
 	}
-	vehicle.Uservehicleid = vid
+	vehicle.Regno = regno
 	authHeader := context.GetHeader("Authorization")
 	token, errToken := c.jwt.ValidateToken(authHeader)
 	if errToken != nil {
@@ -247,7 +246,7 @@ func (c *userController) DeleteVehicle(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, response)
 	}
 
-	result, err := c.userService.IsAllowedToUpdateDelete(userid, vehicle.Uservehicleid)
+	result, err := c.userService.IsAllowedToUpdateDelete(userid, vehicle.Regno)
 
 	if err != nil {
 		res := utils.BadRequest()

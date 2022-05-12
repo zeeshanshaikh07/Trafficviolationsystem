@@ -85,7 +85,7 @@ export default function SingleVehicle(props) {
       chassisno: data.get("vehiclechassisno"),
     };
 
-    await updateVehicle(vehicleData, data.get("uservehicleid"))
+    await updateVehicle(vehicleData, data.get("regno"))
       .then((res) => {
         if (res.status_code === 204) {
           setIsLoading(false);
@@ -162,9 +162,9 @@ export default function SingleVehicle(props) {
                   autoComplete="vehiclechassisno"
                 />
                 <TextField
-                  id="uservehicleid"
-                  name="uservehicleid"
-                  defaultValue={props.uservehicleid}
+                  id="regno"
+                  name="regno"
+                  defaultValue={props.regno}
                   style={{
                     display: "none",
                   }}
@@ -216,7 +216,7 @@ export default function SingleVehicle(props) {
                         padding: "10px 20px",
                       }}
                       variant="contained"
-                      id={props.uservehicleid}
+                      id={props.regno}
                     >
                       Delete
                     </Button>

@@ -89,26 +89,23 @@ func (db *userConnection) Get(userid uint64) ([]model.Uservehicles, error) {
 	return userVehicles, nil
 }
 
-func (db *userConnection) Update(vehicle model.Uservehicles) (model.Uservehicles, error) {
+func (db *userConnection) Update(vehicle model.Uservehicles, vehregno string) (model.Uservehicles, error) {
 
-	resSave := db.connection.Save(&vehicle)
-	if resSave.Error != nil {
-		return vehicle, resSave.Error
-	}
-	resFind := db.connection.Find(&vehicle)
+	resFind := db.connection.Where("regno = ?", vehregno).Updates(&vehicle)
 	if resFind.Error != nil {
 		return vehicle, resFind.Error
 	}
+
 	return vehicle, nil
 }
 
 func (db *userConnection) Delete(vehicle model.Uservehicles) error {
 
-	resFind := db.connection.Where("uservehicleid = ?", vehicle.Uservehicleid).Take(&vehicle)
+	resFind := db.connection.Where("regno = ?", vehicle.Regno).Take(&vehicle)
 	if resFind.Error != nil {
 		return resFind.Error
 	}
-	resDelete := db.connection.Delete(&vehicle)
+	resDelete := db.connection.Where("regno = ?", vehicle.Regno).Delete(&vehicle)
 	if resDelete.Error != nil {
 		return resDelete.Error
 	}
@@ -116,9 +113,9 @@ func (db *userConnection) Delete(vehicle model.Uservehicles) error {
 
 }
 
-func (db *userConnection) FindVehicle(vehicleid uint64) (model.Uservehicles, error) {
+func (db *userConnection) FindVehicle(vehicleregno string) (model.Uservehicles, error) {
 	var vehicle model.Uservehicles
-	res := db.connection.Find(&vehicle, vehicleid)
+	res := db.connection.Where("regno = ?", vehicleregno).Find(&vehicle)
 	if res.Error != nil {
 		return vehicle, res.Error
 	}
