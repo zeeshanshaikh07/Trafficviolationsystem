@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import { login } from "../../libs/api";
+import { useNavigate } from "react-router-dom";
 import { Fragment } from "react";
 import useInput from "../../hooks/use-input";
 import Topbar from "../../layouts/Topbar/Topbar";
@@ -23,6 +24,8 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const {
     value: loginid,
@@ -66,6 +69,10 @@ export default function SignIn() {
         if (res.status_code === 200) {
           setIsLoading(false);
           setSuccess(res.message);
+          setTimeout(() => {
+            navigate("/vehicles");
+            window.location.reload();
+          }, 500);
         } else {
           setIsLoading(false);
           setError(res.message);

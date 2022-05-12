@@ -60,21 +60,36 @@ type UservehiclesDTO struct {
 	Chassisno string `json:"chassisno" form:"chassisno" binding:"required"`
 }
 
+type UservehiclesupdateDTO struct {
+	Uservehicleid uint64 `json:"uservehicleid,omitempty" form:"uservehicleid,omitempty"`
+	Userid        uint64 `json:"userid,omitempty" form:"userid,omitempty"`
+	Regno         string `json:"regno" form:"regno" binding:"required"`
+	Chassisno     string `json:"chassisno" form:"chassisno" binding:"required"`
+}
+
 // -------------------------------------- INTERFACES --------------------------------------
 type UserService interface {
-	RegisterUser(user RegisterDTO) User
+	RegisterUser(user RegisterDTO) (User, error)
 	VerifyCredential(loginid string, password string) interface{}
 	IsDuplicateEmail(loginid string) bool
 	IsDuplicateUsername(loginid string) bool
 	IsDuplicateVehicleRegNo(vehregno string) bool
-	AddVehicle(vehicle UservehiclesDTO) Uservehicles
+	AddVehicle(vehicle UservehiclesDTO) (Uservehicles, error)
+	GetAllUserVehicles(userid uint64) ([]Uservehicles, error)
+	UpdateUserVehicle(Uservehicles UservehiclesupdateDTO, vehregno string) (Uservehicles, error)
+	DeleteUserVehicle(vehicle Uservehicles) error
+	IsAllowedToUpdateDelete(userid uint64, vehicleregno string) (bool, error)
 }
 
 type UserRepository interface {
-	AddUser(user User) User
+	AddUser(user User) (User, error)
 	VerifyCredential(loginid string, password string) interface{}
 	CheckEmail(loginid string) (tx *gorm.DB)
 	CheckUsername(loginid string) (tx *gorm.DB)
 	CheckVehicleRegNo(vehregno string) (tx *gorm.DB)
-	AddVehicle(vehicle Uservehicles) Uservehicles
+	AddVehicle(vehicle Uservehicles) (Uservehicles, error)
+	Get(userid uint64) ([]Uservehicles, error)
+	Update(vehicle Uservehicles, vehregno string) (Uservehicles, error)
+	Delete(vehicle Uservehicles) error
+	FindVehicle(vehicleregno string) (Uservehicles, error)
 }

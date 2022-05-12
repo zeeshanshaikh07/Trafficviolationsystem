@@ -46,3 +46,46 @@ export async function addVehicle(vehicleData) {
 
   return resData;
 }
+
+export async function getVehicles() {
+  const response = await fetch(`${ROOT_ROUTE}/vehicles`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+  if (resData.status_code === 200) {
+    const vehicleData = resData.data;
+
+    return vehicleData;
+  }
+}
+
+export async function updateVehicle(vehicleData, vehicleid) {
+  const response = await fetch(`${ROOT_ROUTE}/vehicles/${vehicleid}`, {
+    method: "PUT",
+    body: JSON.stringify(vehicleData),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  return resData;
+}
+
+export async function deleteVehicle(vehicleid) {
+  const response = await fetch(`${ROOT_ROUTE}/vehicles/${vehicleid}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  return resData;
+}

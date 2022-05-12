@@ -29,6 +29,6 @@ func NewConfig() *Config {
 	if _, err := toml.DecodeFile("./config.toml", &conf); err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("%#v\n", conf)
+
 	return &conf
 }
