@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"trafficviolationsystem/userservice/utils"
+	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

@@ -4,7 +4,8 @@ import (
 	"trafficviolationsystem/userservice/config"
 	"trafficviolationsystem/userservice/middleware"
 	"trafficviolationsystem/userservice/routes"
-	"trafficviolationsystem/userservice/utils"
+
+	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

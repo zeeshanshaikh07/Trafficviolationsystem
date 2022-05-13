@@ -3,7 +3,9 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import SignIn from "./pages/SignIn/SignIn";
 import SignUp from "./pages/SignUp/SignUp";
 import Vehicle from "./pages/Vehicle/Vehicle";
+import VehicleSummary from "./pages/Vehicle/VehicleSummary";
 import Navbar from "./layouts/Navbar/Navbar";
+import Violation from "./pages/Violation/Violation";
 
 function Router() {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -19,6 +21,11 @@ function Router() {
           path="/vehicles"
           element={isAuthenticated ? <Vehicle /> : <Navigate to="/" />}
         />
+        <Route
+          path="/vehicles/:vehicleregno"
+          element={isAuthenticated ? <VehicleSummary /> : <Navigate to="/" />}
+        />
+        <Route path="/violations" element={<Violation />} />
       </Routes>
     </Fragment>
   );

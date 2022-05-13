@@ -7,7 +7,7 @@ import (
 
 	"trafficviolationsystem/userservice/model"
 
-	"trafficviolationsystem/userservice/utils"
+	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -37,7 +37,7 @@ func (c *userController) Login(ctx *gin.Context) {
 	userResult := c.userService.VerifyCredential(loginDTO.Loginid, loginDTO.Password)
 	if v, ok := userResult.(model.User); ok {
 		res := utils.OK(0)
-		generatedToken := c.jwt.GenerateToken(strconv.FormatUint(v.Userid, 10))
+		generatedToken := c.jwt.GenerateToken(v.Userid, v.Loginid, v.Roleid)
 		v.Token = generatedToken
 		response := utils.BuildResponse(res.Message, res.Code, v)
 		ctx.JSON(http.StatusOK, response)
@@ -75,7 +75,7 @@ func (c *userController) Register(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, response)
 		} else {
 			res := utils.Created(0)
-			token := c.jwt.GenerateToken(strconv.FormatUint(createdUser.Userid, 10))
+			token := c.jwt.GenerateToken(createdUser.Userid, createdUser.Loginid, createdUser.Roleid)
 			createdUser.Token = token
 			response := utils.BuildResponse(res.Message, res.Code, createdUser)
 			ctx.JSON(http.StatusCreated, response)
@@ -127,7 +127,7 @@ func (c *userController) AddVehicle(context *gin.Context) {
 	}
 }
 
-func (c *userController) All(context *gin.Context) {
+func (c *userController) AllVehicles(context *gin.Context) {
 	authHeader := context.GetHeader("Authorization")
 	token, errToken := c.jwt.ValidateToken(authHeader)
 	if errToken != nil {
@@ -184,13 +184,6 @@ func (c *userController) UpdateVehicle(context *gin.Context) {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	if !c.userService.IsDuplicateVehicleRegNo(vehicleUpdateDTO.Regno) {
-		res := utils.Conflict(2)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusConflict, response)
 		return
 	}
 
