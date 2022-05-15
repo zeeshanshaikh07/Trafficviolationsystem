@@ -1,8 +1,6 @@
-// import axios from "axios";
-
 const ROOT_ROUTE_USERS = "http://localhost:8000/api/v1/users";
-const ROOT_ROUTE_VEHICLE = "http://localhost:9001/api/v1/vehicle";
-const ROOT_ROUTE_VIOLATION = "http://localhost:8002/api/v1/violation";
+const ROOT_ROUTE_VEHICLES = "http://localhost:8001/api/v1/vehicle";
+const ROOT_ROUTE_VIOLATIONS = "http://localhost:8002/api/v1/violation";
 
 export async function login(userData) {
   const response = await fetch(`${ROOT_ROUTE_USERS}/login`, {
@@ -94,7 +92,7 @@ export async function deleteVehicle(vehicleid) {
 
 export async function getVehicleSummary(vehicleregno) {
   const response = await fetch(
-    `${ROOT_ROUTE_VEHICLE}/registration?vehicleregno=${vehicleregno}`,
+    `${ROOT_ROUTE_VEHICLES}/registration?vehicleregno=${vehicleregno}`,
     {
       method: "GET",
       headers: {
@@ -108,6 +106,7 @@ export async function getVehicleSummary(vehicleregno) {
 }
 
 export async function getViolations() {
+  let loadedViolations = [];
   const response = await fetch(`${ROOT_ROUTE_USERS}/vehicles`, {
     method: "GET",
     headers: {
@@ -116,40 +115,44 @@ export async function getViolations() {
     },
   });
 
-  const loadedViolations = [];
-
   const resData = await response.json();
-  resData.data.map(async (v) => {
-    const response = await fetch(`${ROOT_ROUTE_VIOLATION}/${v.regno}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  if (resData.status_code === 200) {
+    await Promise.all(
+      resData.data.map(async (v) => {
+        const response = await fetch(`${ROOT_ROUTE_VIOLATIONS}/${v.regno}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-    const resData = await response.json();
-    console.log("RESDATA", resData.data);
+        const resData = await response.json();
+        if (resData.status_code === 200) {
+          await Promise.all(
+            resData.data.map(async (item) => {
+              await loadedViolations.push({
+                key: Math.floor(Math.random() * 1000 + 1),
+                regnumber: item.vehicleregno,
+                city: item.city,
+                violationname: item.violationdetails.name,
+                violationdate: item.createdat,
+                state: item.state,
+                charge: item.violationdetails.charge,
+                violationdetails: {
+                  key: Math.floor(Math.random() * 1000 + 1),
+                  violationcode: item.violationdetails.code,
+                  longitude: item.longitude,
+                  latitude: item.latitude,
+                  device: item.devicetype,
+                  description: item.violationdetails.description,
+                },
+              });
+            })
+          );
+        }
+      })
+    );
+  }
 
-    for (const key in resData.data) {
-      loadedViolations.push({
-        regnumber: resData.data[key].vehicleregno,
-        city: resData.data[key].city,
-        violationname: resData.data[key].violationdetails.name,
-        violationdate: resData.data[key].createdat,
-        state: resData.data[key].state,
-        device: resData.data[key].devicetype,
-        violationdetails: {
-          violationcode: resData.data[key].violationdetails.code,
-          longitude: resData.data[key].longitude,
-          latitude: resData.data[key].latitude,
-          violationcharge: resData.data[key].violationdetails.charge,
-          description: resData.data[key].violationdetails.description,
-        },
-      });
-    }
-  });
-
-  const loadedData = await loadedViolations;
-  console.log("FROM API", loadedData);
-  return loadedData;
+  return loadedViolations;
 }

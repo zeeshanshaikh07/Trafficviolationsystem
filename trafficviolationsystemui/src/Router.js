@@ -25,7 +25,10 @@ function Router() {
           path="/vehicles/:vehicleregno"
           element={isAuthenticated ? <VehicleSummary /> : <Navigate to="/" />}
         />
-        <Route path="/violations" element={<Violation />} />
+        <Route
+          path="/violations"
+          element={isAuthenticated ? <Violation /> : <Navigate to="/" />}
+        />
       </Routes>
     </Fragment>
   );

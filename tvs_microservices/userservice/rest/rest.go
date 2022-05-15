@@ -8,8 +8,8 @@ import (
 	"trafficviolationsystem/userservice/model"
 
 	"github.com/KadirSheikh/tvs_utils/utils"
-
 	"github.com/dgrijalva/jwt-go"
+
 	"github.com/gin-gonic/gin"
 )
 
