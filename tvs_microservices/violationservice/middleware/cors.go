@@ -14,11 +14,8 @@ func CORS(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 
 	if c.Request.Method != "OPTIONS" {
-
 		c.Next()
-
 	} else {
-
 		c.AbortWithStatus(http.StatusOK)
 	}
 }

@@ -37,15 +37,10 @@ func (c *violationController) All(context *gin.Context) {
 	authHeader := context.GetHeader("Authorization")
 
 	_, errToken := c.jwtService.ValidateToken(authHeader)
-
 	if errToken != nil {
-
 		res := utils.BadRequest()
-
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-
 		context.JSON(http.StatusBadRequest, response)
-
 	}
 
 	trafficviolationsystem, err := c.violationService.All(vno, closure)
