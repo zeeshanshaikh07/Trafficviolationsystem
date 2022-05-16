@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -184,7 +185,15 @@ export default function SingleVehicle(props) {
                       }}
                       variant="contained"
                     >
-                      View
+                      <Link
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                        }}
+                        to={`/vehicles/${props.regno}`}
+                      >
+                        View
+                      </Link>
                     </Button>
                   </Grid>
                   <Grid item xs={4}>

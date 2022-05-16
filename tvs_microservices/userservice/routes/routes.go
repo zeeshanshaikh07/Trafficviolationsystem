@@ -5,7 +5,8 @@ import (
 	"trafficviolationsystem/userservice/repository"
 	"trafficviolationsystem/userservice/rest"
 	"trafficviolationsystem/userservice/service"
-	"trafficviolationsystem/userservice/utils"
+
+	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -26,7 +27,7 @@ func HandleAuthRequests(r *gin.Engine, db *gorm.DB) {
 		routes.POST("/", userController.Register)
 		routes.POST("/login", userController.Login)
 		routes.POST("/vehicles", middleware.AuthorizeJWT(jwt), userController.AddVehicle)
-		routes.GET("/vehicles", middleware.AuthorizeJWT(jwt), userController.All)
+		routes.GET("/vehicles", middleware.AuthorizeJWT(jwt), userController.AllVehicles)
 		routes.PUT("/vehicles/:vehicleregno", middleware.AuthorizeJWT(jwt), userController.UpdateVehicle)
 		routes.DELETE("/vehicles/:vehicleregno", middleware.AuthorizeJWT(jwt), userController.DeleteVehicle)
 	}

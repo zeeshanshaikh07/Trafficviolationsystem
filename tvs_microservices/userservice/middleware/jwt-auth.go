@@ -4,8 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"trafficviolationsystem/userservice/utils"
-
+	"github.com/KadirSheikh/tvs_utils/utils"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )

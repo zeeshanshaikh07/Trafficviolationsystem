@@ -70,7 +70,7 @@ export default function SignIn() {
           setIsLoading(false);
           setSuccess(res.message);
           setTimeout(() => {
-            navigate("/vehicles");
+            navigate("/violations");
             window.location.reload();
           }, 500);
         } else {

@@ -88,14 +88,6 @@ export default function ButtonAppBar() {
           {roleid === "3" && !isNull && (
             <Fragment>
               <NavLink
-                to={"/profile"}
-                className={({ isActive }) =>
-                  isActive ? classes.activeClass : classes.notActiveClass
-                }
-              >
-                Profile
-              </NavLink>
-              <NavLink
                 to="/violations"
                 className={({ isActive }) =>
                   isActive ? classes.activeClass : classes.notActiveClass
@@ -112,7 +104,14 @@ export default function ButtonAppBar() {
               >
                 Vehicles
               </NavLink>
-
+              <NavLink
+                to={"/profile"}
+                className={({ isActive }) =>
+                  isActive ? classes.activeClass : classes.notActiveClass
+                }
+              >
+                Profile
+              </NavLink>
               <Button
                 sx={{ ml: 2 }}
                 style={{
