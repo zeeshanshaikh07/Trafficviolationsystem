@@ -17,6 +17,7 @@ import Card from "../../layouts/Card/Card";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Modal from "../../layouts/Modal/Modal";
+import FormatDate from "../../utils/FormatDate";
 
 function createData(
   key,
@@ -40,21 +41,21 @@ function createData(
   };
 }
 
-const convertData = (d) => {
-  let date = new Date(d);
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let dt = date.getDate();
+// const convertDate = (d) => {
+//   let date = new Date(d);
+//   let year = date.getFullYear();
+//   let month = date.getMonth() + 1;
+//   let dt = date.getDate();
 
-  if (dt < 10) {
-    dt = "0" + dt;
-  }
-  if (month < 10) {
-    month = "0" + month;
-  }
+//   if (dt < 10) {
+//     dt = "0" + dt;
+//   }
+//   if (month < 10) {
+//     month = "0" + month;
+//   }
 
-  return dt + "-" + month + "-" + year;
-};
+//   return dt + "-" + month + "-" + year;
+// };
 
 const options = ["Open", "Close", "All"];
 
@@ -208,19 +209,6 @@ export default function Violation() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <section
-        style={{
-          textAlign: "center",
-          fontSize: "20px",
-        }}
-      >
-        <p>Loading...</p>
-      </section>
-    );
-  }
-
   const rows = [];
 
   for (const key in violations) {
@@ -229,7 +217,7 @@ export default function Violation() {
         violations[key].key,
         violations[key].regnumber,
         violations[key].violationname,
-        convertData(violations[key].violationdate),
+        FormatDate(violations[key].violationdate),
         violations[key].charge,
         violations[key].city,
         violations[key].state,
@@ -288,6 +276,16 @@ export default function Violation() {
           <h3>Violation Code : s1c1234</h3>
         </div>
       </Modal>
+      {isLoading && (
+        <section
+          style={{
+            textAlign: "center",
+            fontSize: "20px",
+          }}
+        >
+          <p>Loading...</p>
+        </section>
+      )}
       {error && (
         <section
           style={{
@@ -310,7 +308,7 @@ export default function Violation() {
           <p>No violation found.</p>
         </section>
       )}
-      {!error && !isViolationEmpty && (
+      {!error && !isViolationEmpty && !isLoading && (
         <Card>
           {searchNSort}
           <TableContainer

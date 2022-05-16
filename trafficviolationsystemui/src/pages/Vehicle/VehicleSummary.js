@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Card from "../../layouts/Card/Card";
 import Grid from "@mui/material/Grid";
+import FormatDate from "../../utils/FormatDate";
 
 export default function VehicleSummary() {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,21 +18,21 @@ export default function VehicleSummary() {
   const params = useParams();
   const { vehicleregno } = params;
 
-  const convertData = (d) => {
-    let date = new Date(d);
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let dt = date.getDate();
+  // const convertData = (d) => {
+  //   let date = new Date(d);
+  //   let year = date.getFullYear();
+  //   let month = date.getMonth() + 1;
+  //   let dt = date.getDate();
 
-    if (dt < 10) {
-      dt = "0" + dt;
-    }
-    if (month < 10) {
-      month = "0" + month;
-    }
+  //   if (dt < 10) {
+  //     dt = "0" + dt;
+  //   }
+  //   if (month < 10) {
+  //     month = "0" + month;
+  //   }
 
-    return dt + "-" + month + "-" + year;
-  };
+  //   return dt + "-" + month + "-" + year;
+  // };
 
   useEffect(() => {
     async function fetchVehicleData() {
@@ -103,11 +104,11 @@ export default function VehicleSummary() {
             <Grid container spacing={2}>
               <Grid item xs={4}>
                 <p>
-                  Registration Date : {convertData(summary.registrationdate)}
+                  Registration Date : {FormatDate(summary.registrationdate)}
                 </p>
               </Grid>
               <Grid item xs={4}>
-                <p>Expiry Date : {convertData(summary.expirydate)}</p>
+                <p>Expiry Date : {FormatDate(summary.expirydate)}</p>
               </Grid>
             </Grid>
           </Card>
@@ -131,9 +132,7 @@ export default function VehicleSummary() {
                 <p>Manufacturer : {vehicledetails.manufacturer}</p>
               </Grid>
               <Grid item xs={4}>
-                <p>
-                  Purchase Date : {convertData(vehicledetails.purchasedate)}
-                </p>
+                <p>Purchase Date : {FormatDate(vehicledetails.purchasedate)}</p>
               </Grid>
             </Grid>
           </Card>
@@ -143,10 +142,10 @@ export default function VehicleSummary() {
 
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <p>Start Date : {convertData(insurance.startdate)}</p>
+                <p>Start Date : {FormatDate(insurance.startdate)}</p>
               </Grid>
               <Grid item xs={4}>
-                <p>End Date : {convertData(insurance.enddate)}</p>
+                <p>End Date : {FormatDate(insurance.enddate)}</p>
               </Grid>
               <Grid item xs={4}>
                 <p>Provider Name : {insurance.providername}</p>
@@ -181,10 +180,10 @@ export default function VehicleSummary() {
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <p>Start Date : {convertData(puc.startdate)}</p>
+                <p>Start Date : {FormatDate(puc.startdate)}</p>
               </Grid>
               <Grid item xs={4}>
-                <p>End Date : {convertData(puc.enddate)}</p>
+                <p>End Date : {FormatDate(puc.enddate)}</p>
               </Grid>
               <Grid item xs={4}>
                 <p>Provider Name : {puc.providername}</p>
