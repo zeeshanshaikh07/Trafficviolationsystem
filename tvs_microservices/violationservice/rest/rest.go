@@ -33,7 +33,7 @@ func (c *violationController) All(context *gin.Context) {
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
 	}
-	closure := context.Query("datatype")
+	closure := context.Query("closure")
 	authHeader := context.GetHeader("Authorization")
 
 	_, errToken := c.jwtService.ValidateToken(authHeader)
