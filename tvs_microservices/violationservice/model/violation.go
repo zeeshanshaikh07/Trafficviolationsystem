@@ -13,6 +13,7 @@ type Trafficviolationsystem struct {
 	Violationdetailid        uint64           `gorm:"not null" json:"-"`
 	Createdat                time.Time        `json:"createdat"`
 	Updatedat                time.Time        `json:"updatedat"`
+	Isopen                   uint64           `json:"isopen"`
 	Violationdetails         Violationdetails `gorm:"foreignkey:Violationdetailid;constraint:onUpdate:CASCADE,onDelete:CASCADE" json:"violationdetails"`
 }
 
@@ -25,9 +26,9 @@ type Violationdetails struct {
 }
 
 type ViolationService interface {
-	All(vno string, closure string) ([]Trafficviolationsystem, error)
+	GetAllVoilations(vno string, isopen string) ([]Trafficviolationsystem, error)
 }
 
 type ViolationRepository interface {
-	AllViolation(vno string, closure string) ([]Trafficviolationsystem, error)
+	AllViolation(vno string, isopen string) ([]Trafficviolationsystem, error)
 }

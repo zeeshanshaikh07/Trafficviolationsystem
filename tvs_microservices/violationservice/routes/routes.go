@@ -6,6 +6,7 @@ import (
 	"violationdetails/repository"
 	controller "violationdetails/rest"
 	"violationdetails/service"
+
 	"github.com/zeeshanshaikh07/tvs_utils/utils"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,6 @@ func HandleViolationRequests(r *gin.Engine, db *gorm.DB) {
 	)
 	violationRoutes := r.Group("/api/v1/violation", middleware.AuthorizeJWT(jwtService))
 	{
-		violationRoutes.GET("/:vehicleregno", violationController.All)
+		violationRoutes.GET("/:vehicleregno", violationController.GetAllVoilations)
 	}
 }

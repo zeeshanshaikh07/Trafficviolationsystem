@@ -11,7 +11,7 @@ import (
 )
 
 type ViolationController interface {
-	All(context *gin.Context)
+	GetAllVoilations(context *gin.Context)
 }
 
 type violationController struct {
@@ -26,14 +26,14 @@ func NewViolationController(violationServ model.ViolationService, jwtServ utils.
 	}
 }
 
-func (c *violationController) All(context *gin.Context) {
+func (c *violationController) GetAllVoilations(context *gin.Context) {
 	vno := context.Param("vehicleregno")
 	if vno == "" {
 		data := utils.NotFound()
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
 	}
-	closure := context.Query("closure")
+	isopen := context.Query("isopen")
 	authHeader := context.GetHeader("Authorization")
 
 	_, errToken := c.jwtService.ValidateToken(authHeader)
@@ -43,7 +43,7 @@ func (c *violationController) All(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, response)
 	}
 
-	trafficviolationsystem, err := c.violationService.All(vno, closure)
+	trafficviolationsystem, err := c.violationService.GetAllVoilations(vno, isopen)
 	if err != nil {
 		data := utils.NotFound()
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})

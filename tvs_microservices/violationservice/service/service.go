@@ -14,8 +14,8 @@ func NewViolationService(violationRepo model.ViolationRepository) *violationServ
 	}
 }
 
-func (service *violationService) All(vno string, closure string) ([]model.Trafficviolationsystem, error) {
-	res, err := service.violationRepository.AllViolation(vno, closure)
+func (service *violationService) GetAllVoilations(vno string, isopen string) ([]model.Trafficviolationsystem, error) {
+	res, err := service.violationRepository.AllViolation(vno, isopen)
 	if err != nil {
 		return res, err
 	}
