@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//this function is used to validates the token author given and also used to extract author id from the token, return 401 if not valid
 func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -23,7 +22,6 @@ func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
 		token, err := jwtService.ValidateToken(authHeader)
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
-			log.Println("Claim[author_id]: ", claims["author_id"])
 			log.Println("Claim[issuer] :", claims["issuer"])
 		} else {
 			log.Println(err)
