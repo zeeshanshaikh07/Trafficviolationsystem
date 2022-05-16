@@ -1,9 +1,0 @@
-[database]
-host = "localhost"
-database = "tvs_test"
-user = "root"
-password = ""
-secret = "gogormginjwt"
-
-[server]
-port = ":8002"
