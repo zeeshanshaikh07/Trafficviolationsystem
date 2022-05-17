@@ -24,5 +24,6 @@ func HandleViolationRequests(r *gin.Engine, db *gorm.DB) {
 	violationRoutes := r.Group("/api/v1/violation", middleware.AuthorizeJWT(jwtService))
 	{
 		violationRoutes.GET("/:vehicleregno", violationController.GetAllVoilations)
+		violationRoutes.PUT("/:tvsid", violationController.Close)
 	}
 }
