@@ -16,7 +16,6 @@ export function PaytmButton({ amount, orderid, regno }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log(amount, orderid, regno);
     initialize();
   }, [amount, orderid, regno]);
 
@@ -68,8 +67,6 @@ export function PaytmButton({ amount, orderid, regno }) {
           response += chunk;
         });
         post_res.on("end", function () {
-          console.log("RESPONSE: ", response);
-
           setPaymentData({
             ...paymentData,
             token: JSON.parse(response).body.txnToken,
@@ -125,8 +122,6 @@ export function PaytmButton({ amount, orderid, regno }) {
       },
       handler: {
         transactionStatus: async function transactionStatus(paymentStatus) {
-          console.log("paymentStatus => ", paymentStatus);
-
           if (paymentStatus.STATUS === "TXN_SUCCESS") {
             const paymentData = {
               loginid: localStorage.getItem("loginid"),
@@ -138,8 +133,6 @@ export function PaytmButton({ amount, orderid, regno }) {
               transactionid: paymentStatus.TXNID,
             };
 
-            console.log(paymentData);
-
             await storePayment(paymentData)
               .then(async (res) => {
                 if (res.status_code === 201) {
@@ -149,7 +142,6 @@ export function PaytmButton({ amount, orderid, regno }) {
                   await violationClosure(violationData, orderid)
                     .then((res) => {
                       if (res.status_code === 200) {
-                        console.log("RESPONSE CLOSURE", res.message);
                         setTimeout(() => {
                           navigate("/paymentsuccess");
                           window.location.reload();
@@ -157,12 +149,12 @@ export function PaytmButton({ amount, orderid, regno }) {
                       }
                     })
                     .catch((error) => {
-                      console.log(error.message);
+                      alert(error.message);
                     });
                 }
               })
               .catch((error) => {
-                console.log(error.message);
+                alert(error.message);
               });
           } else {
             const paymentData = {
@@ -175,8 +167,6 @@ export function PaytmButton({ amount, orderid, regno }) {
               transactionid: paymentStatus.TXNID,
             };
 
-            console.log(paymentData);
-
             await storePayment(paymentData)
               .then((res) => {
                 if (res.status_code === 201) {
@@ -187,7 +177,7 @@ export function PaytmButton({ amount, orderid, regno }) {
                 }
               })
               .catch((error) => {
-                console.log(error.message);
+                alert(error.message);
               });
           }
 
@@ -205,7 +195,7 @@ export function PaytmButton({ amount, orderid, regno }) {
           window.Paytm.CheckoutJS.invoke();
         })
         .catch(function onError(error) {
-          console.log("Error => ", error);
+          alert("Error => ", error);
         });
     }
   };

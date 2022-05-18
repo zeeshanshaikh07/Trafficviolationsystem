@@ -17,7 +17,7 @@ class PaytmChecksum {
     try {
       decrypted += decipher.final("binary");
     } catch (e) {
-      console.log(e);
+      alert(e);
     }
     return decrypted;
   }
@@ -64,7 +64,6 @@ class PaytmChecksum {
           var salt = buf.toString("base64");
           resolve(salt);
         } else {
-          console.log("error occurred in generateRandomString: " + err);
           reject(err);
         }
       });

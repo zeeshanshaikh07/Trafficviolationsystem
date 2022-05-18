@@ -3,6 +3,13 @@ const ROOT_ROUTE_VEHICLES = "http://localhost:8001/api/v1/vehicle";
 const ROOT_ROUTE_VIOLATIONS = "http://localhost:8002/api/v1/violation";
 const ROOT_ROUTE_PAYMENTS = "http://localhost:8004/api/v1/payments";
 
+const setItem = (token, roleid, loginid) => {
+  localStorage.setItem("token", token);
+  localStorage.setItem("roleid", roleid);
+  localStorage.setItem("loginid", loginid);
+  localStorage.setItem("isLoggedIn", "Y");
+};
+
 export async function login(userData) {
   const response = await fetch(`${ROOT_ROUTE_USERS}/login`, {
     method: "POST",
@@ -12,12 +19,9 @@ export async function login(userData) {
     },
   });
   const resData = await response.json();
-  console.log(resData.data);
+
   if (resData.status_code === 200) {
-    localStorage.setItem("token", resData.data.token);
-    localStorage.setItem("roleid", resData.data.roleid);
-    localStorage.setItem("loginid", resData.data.loginid);
-    localStorage.setItem("isLoggedIn", "Y");
+    setItem(resData.data.token, resData.data.roleid, resData.data.loginid);
   }
 
   return resData;
@@ -33,10 +37,7 @@ export async function register(userData) {
   });
   const resData = await response.json();
   if (resData.status_code === 200) {
-    localStorage.setItem("token", resData.data.token);
-    localStorage.setItem("roleid", resData.data.roleid);
-    localStorage.setItem("loginid", resData.data.loginid);
-    localStorage.setItem("isLoggedIn", "Y");
+    setItem(resData.data.token, resData.data.roleid, resData.data.loginid);
   }
   return resData;
 }
@@ -114,8 +115,6 @@ export async function getVehicleSummary(vehicleregno) {
 }
 
 export async function getViolations(type) {
-  console.log("DROPDOWNVALUE", type);
-
   let violationUrl;
 
   let loadedViolations = [];
