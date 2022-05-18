@@ -20,7 +20,7 @@ import Modal from "../../layouts/Modal/Modal";
 import FormatDate from "../../utils/FormatDate";
 
 function createData(
-  key,
+  violationid,
   regnumber,
   violationname,
   violationdate,
@@ -30,7 +30,7 @@ function createData(
   details
 ) {
   return {
-    key,
+    violationid,
     regnumber,
     violationname,
     violationdate,
@@ -41,36 +41,32 @@ function createData(
   };
 }
 
-// const convertDate = (d) => {
-//   let date = new Date(d);
-//   let year = date.getFullYear();
-//   let month = date.getMonth() + 1;
-//   let dt = date.getDate();
-
-//   if (dt < 10) {
-//     dt = "0" + dt;
-//   }
-//   if (month < 10) {
-//     month = "0" + month;
-//   }
-
-//   return dt + "-" + month + "-" + year;
-// };
-
 const options = ["Open", "Close", "All"];
 
 export default function Violation() {
   const [violations, setViolations] = React.useState([]);
   const [value, setValue] = React.useState(options[0]);
   const [inputValue, setInputValue] = React.useState("");
+  const [charge, setCharge] = React.useState("");
+  const [code, seCode] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [date, setDate] = React.useState("");
+  const [tvsid, setTvsid] = React.useState("");
+  const [regno, setRegno] = React.useState("");
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState();
   const [isViolationEmpty, setIsViolationEmpty] = React.useState(false);
 
   const [open, setOpen] = React.useState(false);
-  const handleClickOpen = () => {
+  const handleClickOpen = (charge, id, code, name, date, regno) => {
     setOpen(true);
+    setCharge(charge);
+    setTvsid(id);
+    seCode(code);
+    setName(name);
+    setDate(date);
+    setRegno(regno);
   };
   const handleClose = () => {
     setOpen(false);
@@ -78,7 +74,7 @@ export default function Violation() {
 
   useEffect(() => {
     async function fetchVehicleData() {
-      await getViolations().then((data) => {
+      await getViolations(value).then((data) => {
         if (data.length !== 0) {
           setViolations(data);
           setIsViolationEmpty(false);
@@ -94,7 +90,7 @@ export default function Violation() {
       // setError(err.message);
       setError("Failed to fetch violations");
     });
-  }, []);
+  }, [value]);
 
   function Row(props) {
     const { row } = props;
@@ -141,28 +137,27 @@ export default function Violation() {
                 >
                   <TableBody>
                     {row.violationdetails.map((violationdetails) => (
-                      <TableRow key={violationdetails.key}>
+                      <TableRow key={violationdetails.violationid}>
                         <TableCell
                           style={{
                             color: "#FFFFFF",
                           }}
                         >
                           Violation Code:{violationdetails.violationcode}
-                          &nbsp;
                         </TableCell>
                         <TableCell
                           style={{
                             color: "#FFFFFF",
                           }}
                         >
-                          Longitude :&nbsp;{violationdetails.longitude}&nbsp;
+                          Longitude : {violationdetails.longitude}
                         </TableCell>
                         <TableCell
                           style={{
                             color: "#FFFFFF",
                           }}
                         >
-                          Latitude :&nbsp;{violationdetails.latitude}
+                          Latitude : {violationdetails.latitude}
                         </TableCell>
 
                         <TableCell
@@ -185,14 +180,22 @@ export default function Violation() {
                           }}
                         >
                           <Button
-                            type="submit"
                             fullWidth
                             variant="contained"
                             style={{
                               backgroundColor: "#4CD137",
                               borderRadius: "20px",
                             }}
-                            onClick={handleClickOpen}
+                            onClick={() =>
+                              handleClickOpen(
+                                violationdetails.charge,
+                                violationdetails.violationid,
+                                violationdetails.violationcode,
+                                violationdetails.violationname,
+                                violationdetails.violationdate,
+                                violationdetails.regnumber
+                              )
+                            }
                           >
                             Pay
                           </Button>
@@ -214,7 +217,7 @@ export default function Violation() {
   for (const key in violations) {
     rows.push(
       createData(
-        violations[key].key,
+        violations[key].violationid,
         violations[key].regnumber,
         violations[key].violationname,
         FormatDate(violations[key].violationdate),
@@ -264,79 +267,87 @@ export default function Violation() {
   return (
     <React.Fragment>
       <Topbar>View Violations</Topbar>
-      <Modal isOpen={open} handleClose={handleClose} title="Confirm Payment">
+      <Modal
+        isOpen={open}
+        charge={charge}
+        tvsid={tvsid}
+        regno={regno}
+        handleClose={handleClose}
+        title="Confirm Payment"
+      >
         <div
           style={{
             textAlign: "center",
           }}
         >
-          <h3>Amount : Rs.1000</h3>
-          <h3>Date : 01-01-2022</h3>
-          <h3>Violation Name : Over-Speeding</h3>
-          <h3>Violation Code : s1c1234</h3>
+          <h3>Amount : Rs.{charge}</h3>
+          <h3>Date : {FormatDate(date)}</h3>
+          <h3>Violation Name : {name}</h3>
+          <h3>Violation Code : {code}</h3>
         </div>
       </Modal>
-      {isLoading && (
-        <section
+
+      <Card>
+        {searchNSort}
+        <TableContainer
           style={{
-            textAlign: "center",
-            fontSize: "20px",
+            marginTop: "50px",
           }}
+          component={Paper}
         >
-          <p>Loading...</p>
-        </section>
-      )}
-      {error && (
-        <section
-          style={{
-            textAlign: "center",
-            fontSize: "20px",
-            color: "red",
-          }}
-        >
-          <p>{error}</p>
-        </section>
-      )}
-      {isViolationEmpty && (
-        <section
-          style={{
-            textAlign: "center",
-            fontSize: "20px",
-            color: "green",
-          }}
-        >
-          <p>No violation found.</p>
-        </section>
-      )}
-      {!error && !isViolationEmpty && !isLoading && (
-        <Card>
-          {searchNSort}
-          <TableContainer
-            style={{
-              marginTop: "50px",
-            }}
-            component={Paper}
-          >
-            <Table aria-label="collapsible table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Vehicle Reg No.</TableCell>
-                  <TableCell>Violation Name</TableCell>
-                  <TableCell>Violation Date</TableCell>
-                  <TableCell>Violation Charge</TableCell>
-                  <TableCell>City</TableCell>
-                  <TableCell>State</TableCell>
-                </TableRow>
-              </TableHead>
+          <Table aria-label="collapsible table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Vehicle Reg No.</TableCell>
+                <TableCell>Violation Name</TableCell>
+                <TableCell>Violation Date</TableCell>
+                <TableCell>Violation Charge</TableCell>
+                <TableCell>City</TableCell>
+                <TableCell>State</TableCell>
+              </TableRow>
+            </TableHead>
+            {!error && !isViolationEmpty && !isLoading && (
               <TableBody>
                 {rows.map((row) => (
-                  <Row key={row.key} row={row} />
+                  <Row key={row.violationid} row={row} />
                 ))}
               </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
-      )}
+            )}
+          </Table>
+        </TableContainer>
+        {isLoading && (
+          <section
+            style={{
+              textAlign: "center",
+              fontSize: "20px",
+            }}
+          >
+            <p>Loading...</p>
+          </section>
+        )}
+        {error && (
+          <section
+            style={{
+              textAlign: "center",
+              fontSize: "20px",
+              color: "red",
+            }}
+          >
+            <p>{error}</p>
+          </section>
+        )}
+        {isViolationEmpty && (
+          <section
+            style={{
+              textAlign: "center",
+              fontSize: "20px",
+              color: "green",
+            }}
+          >
+            <p>No violation found.</p>
+          </section>
+        )}
+      </Card>
     </React.Fragment>
   );
 }

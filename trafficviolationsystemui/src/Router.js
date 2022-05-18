@@ -6,6 +6,8 @@ import Vehicle from "./pages/Vehicle/Vehicle";
 import VehicleSummary from "./pages/Vehicle/VehicleSummary";
 import Navbar from "./layouts/Navbar/Navbar";
 import Violation from "./pages/Violation/Violation";
+import PaymentSuccess from "./pages/PaymentResponse/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentResponse/PaymentFailure";
 
 function Router() {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -28,6 +30,14 @@ function Router() {
         <Route
           path="/violations"
           element={isAuthenticated ? <Violation /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/paymentsuccess"
+          element={isAuthenticated ? <PaymentSuccess /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/paymentfailure"
+          element={isAuthenticated ? <PaymentFailure /> : <Navigate to="/" />}
         />
       </Routes>
     </Fragment>
