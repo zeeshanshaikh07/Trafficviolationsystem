@@ -6,8 +6,17 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { PaytmButton } from "../../utils/Payment/paytmButton";
 
-export default function Modal({ isOpen, handleClose, title, children }) {
+export default function Modal({
+  isOpen,
+  handleClose,
+  title,
+  children,
+  charge,
+  tvsid,
+  regno,
+}) {
   const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     "& .MuiDialogContent-root": {
       padding: theme.spacing(2),
@@ -60,16 +69,9 @@ export default function Modal({ isOpen, handleClose, title, children }) {
       </BootstrapDialogTitle>
       <DialogContent dividers>{children}</DialogContent>
       <DialogActions>
-        <Button
-          variant="contained"
-          onClick={handleClose}
-          style={{
-            backgroundColor: "#32CD32",
-            color: "white",
-          }}
-        >
+        <PaytmButton amount={charge} orderid={tvsid} regno={regno}>
           Confirm
-        </Button>
+        </PaytmButton>
         <Button
           variant="contained"
           autoFocus
@@ -77,6 +79,7 @@ export default function Modal({ isOpen, handleClose, title, children }) {
           style={{
             backgroundColor: "#DC143C",
             color: "white",
+            marginLeft: "1rem",
           }}
         >
           Cancel
