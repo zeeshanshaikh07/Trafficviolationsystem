@@ -7,7 +7,7 @@ import (
 	controller "violationdetails/rest"
 	"violationdetails/service"
 
-	"github.com/zeeshanshaikh07/tvs_utils/utils"
+	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -23,7 +23,8 @@ func HandleViolationRequests(r *gin.Engine, db *gorm.DB) {
 	)
 	violationRoutes := r.Group("/api/v1/violation", middleware.AuthorizeJWT(jwtService))
 	{
-		violationRoutes.GET("/:vehicleregno", violationController.GetAllVoilations)
-		violationRoutes.PUT("/:tvsid", violationController.Close)
+		violationRoutes.GET("/:vehicleregno", violationController.GetAllViolations)
+		violationRoutes.GET("/mode", violationController.GetViolations)
+		violationRoutes.PUT("/:tvsid", violationController.CloseViolation)
 	}
 }

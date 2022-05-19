@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/zeeshanshaikh07/tvs_utils/utils"
+	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"

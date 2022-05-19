@@ -17,15 +17,19 @@ func NewViolationService(violationRepo model.ViolationRepository) *violationServ
 	}
 }
 
-func (service *violationService) GetAllVoilations(vno string, isopen string) ([]model.Violationlist, error) {
-	res, err := service.violationRepository.AllViolation(vno, isopen)
+func (service *violationService) GetAllViolations(vno string, isclose string) ([]model.Violationlist, error) {
+	res, err := service.violationRepository.AllViolation(vno, isclose)
 	if err != nil {
 		return res, err
 	}
 	return res, nil
 }
 
-func (service *violationService) CloseViolation(tvs model.Violationclosedto, tvsid uint64) (model.Violationlist, error) {
+func (service *violationService) GetViolations(filter string, value string) ([]model.Violationlist, error) {
+	return service.violationRepository.GetViolation(filter, value)
+}
+
+func (service *violationService) CloseViolation(tvs model.ViolationCloseDto, tvsid uint64) (model.Violationlist, error) {
 	closeviolation := model.Violationlist{}
 	err := smapping.FillStruct(&closeviolation, smapping.MapFields(&tvs))
 	if err != nil {
