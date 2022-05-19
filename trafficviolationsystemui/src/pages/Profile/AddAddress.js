@@ -102,7 +102,6 @@ export default function AddAddress(props) {
       addresstype: data.get("addresstype"),
     };
 
-    console.log(addData);
     await addAddress(addData)
       .then((res) => {
         if (res.status_code === 201) {

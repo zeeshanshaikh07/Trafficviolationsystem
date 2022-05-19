@@ -18,7 +18,6 @@ export default function Profile() {
     async function fetchVehicleData() {
       await getAddress().then((data) => {
         if (data.length !== 0) {
-          console.log(data);
           setAddressdata(data);
         }
       });

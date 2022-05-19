@@ -74,7 +74,6 @@ export default function Address(props) {
       state: data.get("state"),
     };
 
-    console.log(addData);
     await updateUserAddress(addData, props.addressid)
       .then((res) => {
         if (res.status_code === 200) {

@@ -49,11 +49,8 @@ export default function BasicDetails(props) {
       DOB: data.get("DOB"),
     };
 
-    console.log(uuserData);
-
     await updateBasicDetails(uuserData)
       .then((res) => {
-        console.log(res);
         if (res.status_code === 200) {
           setIsLoading(false);
           setSuccess(res.message);
@@ -66,7 +63,6 @@ export default function BasicDetails(props) {
         }
       })
       .catch((error) => {
-        console.log(error);
         setError(error.message);
       });
   };

@@ -55,8 +55,6 @@ export default function ResetPassword() {
       password: data.get("password"),
     };
 
-    console.log(passData);
-
     await resetPassword(passData)
       .then((res) => {
         if (res.status_code === 200) {

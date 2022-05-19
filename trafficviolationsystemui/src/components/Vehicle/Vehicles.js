@@ -12,7 +12,6 @@ export default function Vehicles() {
   useEffect(() => {
     async function fetchVehicleData() {
       await getVehicles().then((data) => {
-        console.log("DATA", data);
         if (data.length !== 0) {
           setVehicles(data);
           setIsVehiclesEmpty(false);

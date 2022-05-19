@@ -220,7 +220,7 @@ export async function getBasicDetails() {
     },
   });
   const resData = await response.json();
-  console.log(resData.data);
+
   if (resData.status_code === 200) {
     const userData = resData.data;
 
@@ -306,7 +306,6 @@ export async function updateUserAddress(addressData, aid) {
 }
 
 export async function getAllUsers(role) {
-  console.log(role);
   let roleid;
 
   if (role === "Users") {
