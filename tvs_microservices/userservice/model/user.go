@@ -20,7 +20,7 @@ type User struct {
 
 type Useraddress struct {
 	Addressid   uint64 `gorm:"primary_key:auto_increment" json:"addressid"`
-	Userid      uint64 `gorm:"type:bigint(11)" json:"userid"`
+	Loginid     string `gorm:"type:varchar(50)" json:"loginid"`
 	Addresstype string `gorm:"type:varchar(30)" json:"addresstype"`
 	Houseno     string `gorm:"type:varchar(30)" json:"houseno"`
 	Areaname    string `gorm:"type:varchar(30)" json:"areaname"`
@@ -54,6 +54,16 @@ type RegisterDTO struct {
 	Password  string `json:"password" form:"password" binding:"required"`
 }
 
+type UpdateuserDTO struct {
+	Userid   uint64 `json:"userid,omitempty" form:"userid"`
+	Roleid   uint64 `json:"roleid,omitempty" form:"roleid"`
+	Loginid  string `json:"loginid" form:"loginid" binding:"required"`
+	Fullname string `json:"fullname" form:"fullname" binding:"required"`
+	DOB      string `json:"DOB" form:"DOB" binding:"required"`
+	Emailid  string `json:"emailid" form:"emailid" binding:"required"`
+	Mobileno string `json:"mobileno" form:"mobileno" binding:"required"`
+}
+
 type UservehiclesDTO struct {
 	Userid    uint64 `json:"userid,omitempty" form:"userid,omitempty"`
 	Regno     string `json:"regno" form:"regno" binding:"required"`
@@ -65,6 +75,25 @@ type UservehiclesupdateDTO struct {
 	Userid        uint64 `json:"userid,omitempty" form:"userid,omitempty"`
 	Regno         string `json:"regno" form:"regno" binding:"required"`
 	Chassisno     string `json:"chassisno" form:"chassisno" binding:"required"`
+}
+
+type Useraddressdto struct {
+	Loginid     string `json:"loginid,omitempty" form:"loginid,omitempty"`
+	Addresstype string `json:"addresstype" form:"addresstype" binding:"required"`
+	Houseno     string `json:"houseno" form:"houseno" binding:"required"`
+	Areaname    string `json:"areaname" form:"areaname" binding:"required"`
+	Pincode     string `json:"pincode" form:"pincode" binding:"required"`
+	City        string `json:"city" form:"city" binding:"required"`
+	State       string `json:"state" form:"state" binding:"required"`
+}
+
+type Updateuseraddressdto struct {
+	Addresstype string `json:"addresstype" form:"addresstype" binding:"required"`
+	Houseno     string `json:"houseno" form:"houseno" binding:"required"`
+	Areaname    string `json:"areaname" form:"areaname" binding:"required"`
+	Pincode     string `json:"pincode" form:"pincode" binding:"required"`
+	City        string `json:"city" form:"city" binding:"required"`
+	State       string `json:"state" form:"state" binding:"required"`
 }
 
 // -------------------------------------- INTERFACES --------------------------------------
@@ -79,6 +108,15 @@ type UserService interface {
 	UpdateUserVehicle(Uservehicles UservehiclesupdateDTO, vehregno string) (Uservehicles, error)
 	DeleteUserVehicle(vehicle Uservehicles) error
 	IsAllowedToUpdateDelete(userid uint64, vehicleregno string) (bool, error)
+
+	GetUserDetails(loginid string) (User, error)
+	AddUserAddress(address Useraddressdto) (Useraddress, error)
+	GetUserAddress(loginid string) ([]Useraddress, error)
+	GetAllUser(roleid uint64) ([]User, error)
+
+	ResetPassword(logindto LoginDTO) error
+	UpdateUserDetails(User UpdateuserDTO, loginid string) (User, error)
+	UpdateUserAddress(User Updateuseraddressdto, addressid uint64) (Useraddress, error)
 }
 
 type UserRepository interface {
@@ -88,8 +126,17 @@ type UserRepository interface {
 	CheckUsername(loginid string) (tx *gorm.DB)
 	CheckVehicleRegNo(vehregno string) (tx *gorm.DB)
 	AddVehicle(vehicle Uservehicles) (Uservehicles, error)
-	Get(userid uint64) ([]Uservehicles, error)
-	Update(vehicle Uservehicles, vehregno string) (Uservehicles, error)
-	Delete(vehicle Uservehicles) error
+	GetVehicles(userid uint64) ([]Uservehicles, error)
+	UpdateUserVehicle(vehicle Uservehicles, vehregno string) (Uservehicles, error)
+	DeleteUserVehicle(vehicle Uservehicles) error
 	FindVehicle(vehicleregno string) (Uservehicles, error)
+
+	GetUserDetails(loginid string) (User, error)
+	AddAddress(address Useraddress) (Useraddress, error)
+	GetUserAddress(loginid string) ([]Useraddress, error)
+	GetAllUser(roleid uint64) ([]User, error)
+
+	ResetPassword(logindto LoginDTO) error
+	UpdateUserDetails(user User, loginid string) (User, error)
+	UpdateUserAddress(address Useraddress, addressid uint64) (Useraddress, error)
 }
