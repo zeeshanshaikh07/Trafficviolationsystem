@@ -3,22 +3,28 @@ package main
 import (
 	"fmt"
 
-	"trafficsystem.com/vehicleregistrationservice/db"
-	"trafficsystem.com/vehicleregistrationservice/helper"
+	db "trafficsystem.com/vehicleregistrationservice/config"
+	"trafficsystem.com/vehicleregistrationservice/middleware"
 	"trafficsystem.com/vehicleregistrationservice/routes"
+	"trafficsystem.com/vehicleregistrationservice/service"
+	"trafficsystem.com/vehicleregistrationservice/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func initializeComponents(r *gin.Engine, conf *helper.Config) {
+func initializeComponents(r *gin.Engine, conf *utils.Config) {
 	//Get db object
 	gormCon := db.InitializeDbConnection(conf)
+
+	r.Use(middleware.CORSMiddleware())
+
+	r.Use(middleware.AuthMiddleware(service.NewJWTService(conf.AuthInfo.Secrekey)))
 
 	routes.HandleRegistrationRequests(r, gormCon)
 }
 
 func initializeConfigsAndRoutes(r *gin.Engine) {
-	conf := helper.NewConfig() //Initialize config
+	conf := utils.NewConfig() //Initialize config
 
 	initializeComponents(r, conf)
 

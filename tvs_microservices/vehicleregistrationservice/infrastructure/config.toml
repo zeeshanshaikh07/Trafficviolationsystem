@@ -6,8 +6,10 @@ user="root"
 password="root123"
 
 [server]
-port="5000"
+port="9001"
 
 [servicecommunication]
 port="5000"
 
+[authkey]
+scretkey="trafficviolationsystemjwt"
