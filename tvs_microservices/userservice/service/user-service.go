@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -39,11 +40,8 @@ func (service *userService) RegisterUser(user model.RegisterDTO) (model.User, er
 	if err != nil {
 		log.Print(err)
 	}
-	res, err := service.userRepository.AddUser(userToCreate)
-	if err != nil {
-		return res, err
-	}
-	return res, nil
+	return service.userRepository.AddUser(userToCreate)
+
 }
 
 func comparePassword(hashedPwd string, plainPassword []byte) bool {
@@ -75,43 +73,19 @@ func (service *userService) AddVehicle(vehicle model.UservehiclesDTO) (model.Use
 	userVehicle := model.Uservehicles{}
 	err := smapping.FillStruct(&userVehicle, smapping.MapFields(&vehicle))
 	if err != nil {
-		panic(err)
+		return userVehicle, err
 	}
-	res, err := service.userRepository.AddVehicle(userVehicle)
-	if err != nil {
-		return res, err
-	}
-	return res, nil
-
+	return service.userRepository.AddVehicle(userVehicle)
 }
 
 func (service *userService) GetAllUserVehicles(userid uint64) ([]model.Uservehicles, error) {
-	res, err := service.userRepository.Get(userid)
-	if err != nil {
-		return res, err
-	}
-	return res, nil
-}
+	return service.userRepository.GetVehicles(userid)
 
-func (service *userService) UpdateUserVehicle(vehicle model.UservehiclesupdateDTO, vehregno string) (model.Uservehicles, error) {
-	vehicleToUpdate := model.Uservehicles{}
-	err := smapping.FillStruct(&vehicleToUpdate, smapping.MapFields(&vehicle))
-	if err != nil {
-		log.Fatalf("Failed map %v:", err)
-	}
-	updatedVehicle, err := service.userRepository.Update(vehicleToUpdate, vehregno)
-	if err != nil {
-		return updatedVehicle, err
-	}
-	return updatedVehicle, nil
 }
 
 func (service *userService) DeleteUserVehicle(vehicle model.Uservehicles) error {
-	err := service.userRepository.Delete(vehicle)
-	if err != nil {
-		return err
-	}
-	return nil
+	return service.userRepository.DeleteUserVehicle(vehicle)
+
 }
 
 func (service *userService) IsAllowedToUpdateDelete(userid uint64, vehicleregno string) (bool, error) {
@@ -126,4 +100,70 @@ func (service *userService) IsAllowedToUpdateDelete(userid uint64, vehicleregno 
 	}
 
 	return userid == id, nil
+}
+
+func (service *userService) GetUserDetails(loginid string) (model.User, error) {
+	return service.userRepository.GetUserDetails(loginid)
+
+}
+
+func (service *userService) AddUserAddress(address model.Useraddressdto) (model.Useraddress, error) {
+	userAddress := model.Useraddress{}
+	err := smapping.FillStruct(&userAddress, smapping.MapFields(&address))
+	if err != nil {
+		return userAddress, err
+	}
+	return service.userRepository.AddAddress(userAddress)
+}
+
+func (service *userService) GetUserAddress(loginid string) ([]model.Useraddress, error) {
+	return service.userRepository.GetUserAddress(loginid)
+}
+
+func (service *userService) GetAllUser(roleid uint64) ([]model.User, error) {
+	return service.userRepository.GetAllUser(roleid)
+}
+
+func (service *userService) ResetPassword(logindto model.LoginDTO) error {
+
+	res := service.userRepository.VerifyCredential(logindto.Loginid, logindto.Password)
+
+	if v, ok := res.(model.User); ok {
+		comparedPassword := comparePassword(v.Password, []byte(logindto.Password))
+
+		if comparedPassword {
+			return errors.New("old and new password are same")
+		}
+		err := service.userRepository.ResetPassword(logindto)
+		return err
+	}
+	return errors.New("no record for given creds")
+}
+
+func (service *userService) UpdateUserVehicle(vehicle model.UservehiclesupdateDTO, vehregno string) (model.Uservehicles, error) {
+	vehicleToUpdate := model.Uservehicles{}
+	err := smapping.FillStruct(&vehicleToUpdate, smapping.MapFields(&vehicle))
+	if err != nil {
+		log.Fatalf("Failed map %v:", err)
+	}
+	return service.userRepository.UpdateUserVehicle(vehicleToUpdate, vehregno)
+
+}
+
+func (service *userService) UpdateUserDetails(user model.UpdateuserDTO, loginid string) (model.User, error) {
+	userToUpdate := model.User{}
+	err := smapping.FillStruct(&userToUpdate, smapping.MapFields(&user))
+	if err != nil {
+		log.Fatalf("Failed map %v:", err)
+	}
+	return service.userRepository.UpdateUserDetails(userToUpdate, loginid)
+}
+
+func (service *userService) UpdateUserAddress(address model.Updateuseraddressdto, addid uint64) (model.Useraddress, error) {
+	addressToUpdate := model.Useraddress{}
+	err := smapping.FillStruct(&addressToUpdate, smapping.MapFields(&address))
+	if err != nil {
+		log.Fatalf("Failed map %v:", err)
+	}
+	return service.userRepository.UpdateUserAddress(addressToUpdate, addid)
 }

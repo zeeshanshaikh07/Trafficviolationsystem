@@ -30,5 +30,15 @@ func HandleAuthRequests(r *gin.Engine, db *gorm.DB) {
 		routes.GET("/vehicles", middleware.AuthorizeJWT(jwt), userController.AllVehicles)
 		routes.PUT("/vehicles/:vehicleregno", middleware.AuthorizeJWT(jwt), userController.UpdateVehicle)
 		routes.DELETE("/vehicles/:vehicleregno", middleware.AuthorizeJWT(jwt), userController.DeleteVehicle)
+
+		routes.GET("/", middleware.AuthorizeJWT(jwt), userController.UserDetails)
+		routes.POST("/address", middleware.AuthorizeJWT(jwt), userController.AddAddress)
+		routes.GET("/address", middleware.AuthorizeJWT(jwt), userController.GetAddress)
+		routes.PUT("/reset", middleware.AuthorizeJWT(jwt), userController.ResetPassword)
+		routes.PUT("/", middleware.AuthorizeJWT(jwt), userController.UpdateUserDetails)
+		routes.PUT("/address/:addressid", userController.UpdateUserAddress)
+
+		routes.GET("/:roleid", middleware.AuthorizeJWT(jwt), userController.GetAllUsers)
+
 	}
 }

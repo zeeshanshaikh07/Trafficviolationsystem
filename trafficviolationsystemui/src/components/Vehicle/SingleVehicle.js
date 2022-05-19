@@ -44,7 +44,7 @@ export default function SingleVehicle(props) {
             setIsLoading(true);
             await deleteVehicle(event.target.id)
               .then((res) => {
-                if (res.status_code === 204) {
+                if (res.status_code === 200) {
                   setIsLoading(false);
                   setSuccess(res.message);
                 } else {
@@ -88,7 +88,7 @@ export default function SingleVehicle(props) {
 
     await updateVehicle(vehicleData, data.get("regno"))
       .then((res) => {
-        if (res.status_code === 204) {
+        if (res.status_code === 200) {
           setIsLoading(false);
           setSuccess(res.message);
           setTimeout(() => {

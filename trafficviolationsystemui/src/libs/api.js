@@ -69,6 +69,8 @@ export async function getVehicles() {
     const vehicleData = resData.data;
 
     return vehicleData;
+  } else {
+    return [];
   }
 }
 
@@ -207,4 +209,140 @@ export async function violationClosure(violationData, violationid) {
   const resData = await response.json();
 
   return resData;
+}
+
+export async function getBasicDetails() {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    const userData = resData.data;
+
+    return userData;
+  } else {
+    return [];
+  }
+}
+
+export async function addAddress(addressData) {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/address`, {
+    method: "POST",
+    body: JSON.stringify(addressData),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  return resData;
+}
+
+export async function getAddress() {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/address`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+  if (resData.status_code === 200) {
+    const addData = resData.data;
+    return addData;
+  } else {
+    return [];
+  }
+}
+
+export async function updateBasicDetails(userData) {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/`, {
+    method: "PUT",
+    body: JSON.stringify(userData),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+  if (resData.status_code === 200) {
+    setItem(resData.data.token, resData.data.roleid, resData.data.loginid);
+  }
+
+  return resData;
+}
+
+export async function resetPassword(passwordData) {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/reset`, {
+    method: "PUT",
+    body: JSON.stringify(passwordData),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  return resData;
+}
+
+export async function updateUserAddress(addressData, aid) {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/address/${aid}`, {
+    method: "PUT",
+    body: JSON.stringify(addressData),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+  return resData;
+}
+
+export async function getAllUsers(role) {
+  let roleid;
+
+  if (role === "Users") {
+    roleid = 3;
+  } else {
+    roleid = 2;
+  }
+
+  const response = await fetch(`${ROOT_ROUTE_USERS}/${roleid}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    return resData.data;
+  } else {
+    return [];
+  }
+}
+
+export async function getUserPayment(loginid) {
+  const response = await fetch(`${ROOT_ROUTE_PAYMENTS}/${loginid}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    return resData.data;
+  } else {
+    return [];
+  }
 }

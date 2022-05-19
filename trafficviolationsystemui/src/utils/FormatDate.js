@@ -11,5 +11,5 @@ export default function FormatDate(d) {
     month = "0" + month;
   }
 
-  return dt + "-" + month + "-" + year;
+  return year + "-" + month + "-" + dt;
 }
