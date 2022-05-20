@@ -8,10 +8,10 @@ import (
 	"violationdetails/middleware"
 	"violationdetails/routes"
 
-	"github.com/zeeshanshaikh07/tvs_utils/utils"
+	"github.com/KadirSheikh/tvs_utils/utils"
 )
 
-func initializeDbAndRoutes(r *gin.Engine) {
+func initialize(r *gin.Engine) {
 	var (
 		db *gorm.DB = config.SetupDBConnection()
 	)
@@ -29,5 +29,5 @@ func main() {
 	r := gin.Default()
 
 	r.Use(middleware.CORS)
-	initializeDbAndRoutes(r)
+	initialize(r)
 }

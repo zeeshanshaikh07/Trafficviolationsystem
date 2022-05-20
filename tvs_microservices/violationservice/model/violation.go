@@ -13,7 +13,7 @@ type Violationlist struct {
 	Violationdetailid uint64           `gorm:"not null" json:"-"`
 	Createdat         time.Time        `json:"createdat"`
 	Updatedat         time.Time        `json:"updatedat"`
-	Isopen            uint64           `json:"isopen"`
+	Isclose           uint64           `json:"isclose"`
 	Violationdetails  Violationdetails `gorm:"foreignkey:Violationdetailid;constraint:onUpdate:CASCADE,onDelete:CASCADE" json:"violationdetails"`
 }
 
@@ -25,16 +25,18 @@ type Violationdetails struct {
 	Description        string `gorm:"type:varchar(255)" json:"description"`
 }
 
-type Violationclosedto struct {
-	Isopen uint64 `json:"isopen"`
+type ViolationCloseDto struct {
+	Isclose uint64 `json:"isclose"`
 }
 
 type ViolationService interface {
-	GetAllVoilations(vno string, isopen string) ([]Violationlist, error)
-	CloseViolation(Violationlist Violationclosedto, tvsid uint64) (Violationlist, error)
+	GetAllViolations(vno string, isclose string) ([]Violationlist, error)
+	GetViolations(filter string, value string) ([]Violationlist, error)
+	CloseViolation(Violationlist ViolationCloseDto, tvsid uint64) (Violationlist, error)
 }
 
 type ViolationRepository interface {
-	AllViolation(vno string, isopen string) ([]Violationlist, error)
+	AllViolation(vno string, isclose string) ([]Violationlist, error)
+	GetViolation(filter string, value string) ([]Violationlist, error)
 	CloseViolationStatus(tvs Violationlist, tvsid uint64) (Violationlist, error)
 }
