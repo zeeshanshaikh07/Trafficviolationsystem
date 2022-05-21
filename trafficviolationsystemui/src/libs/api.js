@@ -1,7 +1,7 @@
 const ROOT_ROUTE_USERS = "http://localhost:8000/api/v1/users";
-const ROOT_ROUTE_VEHICLES = "http://localhost:8001/api/v1/vehicle";
+const ROOT_ROUTE_VEHICLES = "http://localhost:9001/api/v1/vehicle";
 const ROOT_ROUTE_VIOLATIONS = "http://localhost:8002/api/v1/violation";
-const ROOT_ROUTE_PAYMENTS = "http://localhost:8004/api/v1/payments";
+const ROOT_ROUTE_PAYMENTS = "http://localhost:9003/api/v1/payments";
 
 const setItem = (token, roleid, loginid) => {
   localStorage.setItem("token", token);
@@ -74,6 +74,27 @@ export async function getVehicles() {
   }
 }
 
+export async function getAllVehicles(loginid) {
+  const response = await fetch(
+    `${ROOT_ROUTE_USERS}/vehicles?loginid=${loginid}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token"),
+      },
+    }
+  );
+  const resData = await response.json();
+  if (resData.status_code === 200) {
+    const vehicleData = resData.data;
+
+    return vehicleData;
+  } else {
+    return [];
+  }
+}
+
 export async function updateVehicle(vehicleData, vehicleid) {
   const response = await fetch(`${ROOT_ROUTE_USERS}/vehicles/${vehicleid}`, {
     method: "PUT",
@@ -133,9 +154,9 @@ export async function getViolations(type) {
     await Promise.all(
       resData.data.map(async (v) => {
         if (type === "Open") {
-          violationUrl = `${ROOT_ROUTE_VIOLATIONS}/${v.regno}?isopen=0`;
+          violationUrl = `${ROOT_ROUTE_VIOLATIONS}/${v.regno}?isclose=0`;
         } else if (type === "Close") {
-          violationUrl = `${ROOT_ROUTE_VIOLATIONS}/${v.regno}?isopen=1`;
+          violationUrl = `${ROOT_ROUTE_VIOLATIONS}/${v.regno}?isclose=1`;
         } else {
           violationUrl = `${ROOT_ROUTE_VIOLATIONS}/${v.regno}`;
         }
@@ -284,7 +305,6 @@ export async function resetPassword(passwordData) {
     body: JSON.stringify(passwordData),
     headers: {
       "Content-Type": "application/json",
-      Authorization: localStorage.getItem("token"),
     },
   });
   const resData = await response.json();
@@ -345,4 +365,63 @@ export async function getUserPayment(loginid) {
   } else {
     return [];
   }
+}
+
+export async function getUserBasicDetails(loginid) {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/?loginid=${loginid}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    const userData = resData.data;
+
+    return userData;
+  } else {
+    return [];
+  }
+}
+
+export async function getAllViolations(filter, value) {
+  let loadedViolations = [];
+  let violationUrl = `http://localhost:8002/api/v1/violation/mode?filter=${filter}&value=${value}`;
+
+  const response = await fetch(violationUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("token"),
+    },
+  });
+
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    resData.data.map((item) => {
+      loadedViolations.push({
+        violationid: item.violationlistid,
+        regnumber: item.vehicleregno,
+        city: item.city,
+        violationname: item.violationdetails.name,
+        violationdate: item.createdat,
+        state: item.state,
+        charge: item.violationdetails.charge,
+        violationdetails: {
+          violationcode: item.violationdetails.code,
+          longitude: item.longitude,
+          latitude: item.latitude,
+          device: item.devicetype,
+          description: item.violationdetails.description,
+        },
+      });
+    });
+  }
+
+  console.log(loadedViolations);
+
+  return loadedViolations;
 }

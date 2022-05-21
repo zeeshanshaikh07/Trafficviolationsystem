@@ -78,8 +78,8 @@ func (service *userService) AddVehicle(vehicle model.UservehiclesDTO) (model.Use
 	return service.userRepository.AddVehicle(userVehicle)
 }
 
-func (service *userService) GetAllUserVehicles(userid uint64) ([]model.Uservehicles, error) {
-	return service.userRepository.GetVehicles(userid)
+func (service *userService) GetAllUserVehicles(loginid string) ([]model.Uservehicles, error) {
+	return service.userRepository.GetVehicles(loginid)
 
 }
 

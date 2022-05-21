@@ -13,6 +13,7 @@ import Button from "@mui/material/Button";
 import { getAllUsers } from "../../libs/api";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { Link } from "react-router-dom";
 
 const columns = [
   { id: "username", label: "Username", minWidth: 80 },
@@ -37,15 +38,10 @@ const columns = [
     label: "View Details",
     minWidth: 80,
   },
-  {
-    id: "action",
-    label: "Action",
-    minWidth: 80,
-  },
 ];
 
-function createData(username, fulname, emailid, mobileno, role, view, action) {
-  return { username, fulname, emailid, mobileno, role, view, action };
+function createData(username, fulname, emailid, mobileno, role, view) {
+  return { username, fulname, emailid, mobileno, role, view };
 }
 
 const options = ["Users", "Admins"];
@@ -104,8 +100,17 @@ export default function ViewUsers() {
         users[key].emailid,
         users[key].mobileno,
         role,
-        <Button variant="contained">View</Button>,
-        <Button variant="outlined">Enable</Button>
+        <Button variant="contained">
+          <Link
+            style={{
+              textDecoration: "none",
+              color: "white",
+            }}
+            to={`/viewusers/${users[key].loginid}`}
+          >
+            View
+          </Link>
+        </Button>
       )
     );
   }
@@ -145,96 +150,128 @@ export default function ViewUsers() {
   return (
     <React.Fragment>
       <Topbar>Users List</Topbar>
-      <Card>
-        {searchNSort}
-        <Paper sx={{ width: "100%", overflow: "hidden" }}>
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={column.id}
-                      align={column.align}
-                      style={{ minWidth: column.minWidth }}
-                    >
-                      {column.label}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              {!error && !isUserEmpty && !isLoading && (
-                <TableBody>
-                  {rows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      return (
-                        <TableRow
-                          hover
-                          role="checkbox"
-                          tabIndex={-1}
-                          key={row.code}
-                        >
-                          {columns.map((column) => {
-                            const value = row[column.id];
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === "number"
-                                  ? column.format(value)
-                                  : value}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              )}
-            </Table>
-          </TableContainer>
-          {isLoading && (
-            <section
-              style={{
-                textAlign: "center",
-                fontSize: "20px",
-              }}
-            >
-              <p>Loading...</p>
-            </section>
-          )}
-          {error && (
-            <section
-              style={{
-                textAlign: "center",
-                fontSize: "20px",
-                color: "red",
-              }}
-            >
-              <p>{error}</p>
-            </section>
-          )}
-          {isUserEmpty && (
-            <section
-              style={{
-                textAlign: "center",
-                fontSize: "20px",
-                color: "red",
-              }}
-            >
-              <p>No User found.</p>
-            </section>
-          )}
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
-      </Card>
+      <Button
+        style={{
+          backgroundColor: "#313082",
+          float: "right",
+          border: "none",
+          color: "white",
+          borderRadius: "20px",
+          padding: "10px 30px",
+          marginRight: "30px",
+          marginTop: "30px",
+        }}
+        variant="contained"
+      >
+        <Link
+          style={{
+            textDecoration: "none",
+            color: "white",
+          }}
+          to="/adduser"
+        >
+          Add user
+        </Link>
+      </Button>
+      <div
+        style={{
+          marginTop: "100px",
+        }}
+      >
+        <Card>
+          {searchNSort}
+          <Paper sx={{ width: "100%", overflow: "hidden" }}>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                {!error && !isUserEmpty && !isLoading && (
+                  <TableBody>
+                    {rows
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row) => {
+                        return (
+                          <TableRow
+                            hover
+                            role="checkbox"
+                            tabIndex={-1}
+                            key={row.code}
+                          >
+                            {columns.map((column) => {
+                              const value = row[column.id];
+                              return (
+                                <TableCell key={column.id} align={column.align}>
+                                  {column.format && typeof value === "number"
+                                    ? column.format(value)
+                                    : value}
+                                </TableCell>
+                              );
+                            })}
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                )}
+              </Table>
+            </TableContainer>
+            {isLoading && (
+              <section
+                style={{
+                  textAlign: "center",
+                  fontSize: "20px",
+                }}
+              >
+                <p>Loading...</p>
+              </section>
+            )}
+            {error && (
+              <section
+                style={{
+                  textAlign: "center",
+                  fontSize: "20px",
+                  color: "red",
+                }}
+              >
+                <p>{error}</p>
+              </section>
+            )}
+            {isUserEmpty && (
+              <section
+                style={{
+                  textAlign: "center",
+                  fontSize: "20px",
+                  color: "red",
+                }}
+              >
+                <p>No User found.</p>
+              </section>
+            )}
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 100]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+        </Card>
+      </div>
     </React.Fragment>
   );
 }

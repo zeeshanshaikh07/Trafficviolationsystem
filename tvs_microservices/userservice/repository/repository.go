@@ -64,12 +64,12 @@ func hashAndSalt(pwd []byte) string {
 	return string(hash)
 }
 
-func (db *userConnection) GetVehicles(userid uint64) ([]model.Uservehicles, error) {
+func (db *userConnection) GetVehicles(loginid string) ([]model.Uservehicles, error) {
 	var userVehicles []model.Uservehicles
 
-	resFind := db.connection.Where("userid = ?", userid).Take(&userVehicles)
+	resFind := db.connection.Where("loginid = ?", loginid).Take(&userVehicles)
 	if resFind.Error == nil {
-		res := db.connection.Where("userid = ?", userid).Find(&userVehicles)
+		res := db.connection.Where("loginid = ?", loginid).Find(&userVehicles)
 		return userVehicles, res.Error
 	}
 	return userVehicles, resFind.Error

@@ -16,7 +16,7 @@ func initializeComponents(r *gin.Engine, conf *utils.Config) {
 	//Get db object
 	gormCon := db.InitializeDbConnection(conf)
 
-	r.Use(middleware.CORSMiddleware())
+	// r.Use(middleware.CORSMiddleware())
 
 	r.Use(middleware.AuthMiddleware(service.NewJWTService(conf.AuthInfo.Secrekey)))
 
@@ -37,6 +37,6 @@ func initializeConfigsAndRoutes(r *gin.Engine) {
 
 func main() {
 	r := gin.Default()
-
+	r.Use(middleware.CORS)
 	initializeConfigsAndRoutes(r)
 }

@@ -18,9 +18,7 @@ func initialize(r *gin.Engine) {
 	)
 
 	defer config.CloseDBConnection(db)
-	r.Use(middleware.CORS)
-
-	routes.HandleAuthRequests(r, db)
+	routes.HandleRequests(r, db)
 
 	PORT := conf.Server.Port
 	r.Run(PORT)
@@ -29,6 +27,7 @@ func initialize(r *gin.Engine) {
 func main() {
 
 	r := gin.Default()
+	r.Use(middleware.CORS)
 	initialize(r)
 
 }

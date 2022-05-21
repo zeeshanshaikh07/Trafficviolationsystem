@@ -5,7 +5,7 @@ import { storePayment, violationClosure } from "../../libs/api";
 const PaytmChecksum = require("./paytmChecksum");
 const https = require("https");
 
-export function PaytmButton({ amount, orderid, regno }) {
+export function PaytmButton({ amount, orderid, regno, violationname }) {
   const navigate = useNavigate();
   const [paymentData, setPaymentData] = useState({
     token: "",
@@ -122,6 +122,13 @@ export function PaytmButton({ amount, orderid, regno }) {
       },
       handler: {
         transactionStatus: async function transactionStatus(paymentStatus) {
+          var today = new Date();
+          var date =
+            today.getFullYear() +
+            "-" +
+            (today.getMonth() + 1) +
+            "-" +
+            today.getDate();
           if (paymentStatus.STATUS === "TXN_SUCCESS") {
             const paymentData = {
               loginid: localStorage.getItem("loginid"),
@@ -131,17 +138,22 @@ export function PaytmButton({ amount, orderid, regno }) {
               paymentmode: paymentStatus.PAYMENTMODE,
               vehicleregno: regno,
               transactionid: paymentStatus.TXNID,
+              violationname: violationname,
+              transactiondate: date,
             };
+
+            console.log("PAYMENTDATA", JSON.stringify(paymentData));
 
             await storePayment(paymentData)
               .then(async (res) => {
-                if (res.status_code === 201) {
+                if (res.status_code === 200 || res.status_code === 201) {
                   const violationData = {
-                    isopen: 1,
+                    isclose: 1,
                   };
+                  console.log("violationData", JSON.stringify(violationData));
                   await violationClosure(violationData, orderid)
                     .then((res) => {
-                      if (res.status_code === 200) {
+                      if (res.status_code === 200 || res.status_code === 204) {
                         setTimeout(() => {
                           navigate("/paymentsuccess");
                           window.location.reload();
@@ -165,6 +177,8 @@ export function PaytmButton({ amount, orderid, regno }) {
               paymentmode: paymentStatus.PAYMENTMODE,
               vehicleregno: regno,
               transactionid: paymentStatus.TXNID,
+              violationname: violationname,
+              transactiondate: date,
             };
 
             await storePayment(paymentData)

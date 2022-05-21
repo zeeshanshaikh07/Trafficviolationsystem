@@ -114,6 +114,17 @@ func (c *userController) AddVehicle(context *gin.Context) {
 		if err == nil {
 			userVehicleDTO.Userid = userid
 		}
+
+		loginid := fmt.Sprintf("%v", claims["loginid"])
+		if loginid == "" {
+			res := utils.NotFound(0)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusNotFound, response)
+		}
+		if err == nil {
+			userVehicleDTO.Loginid = loginid
+		}
+
 		result, err := c.userService.AddVehicle(userVehicleDTO)
 		if err != nil {
 			res := utils.BadRequest()
@@ -137,21 +148,36 @@ func (c *userController) AllVehicles(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, response)
 	}
 	claims := token.Claims.(jwt.MapClaims)
-	userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
-	if err != nil {
+	loginid := fmt.Sprintf("%v", claims["loginid"])
+	if loginid == "" {
 		res := utils.NotFound(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusNotFound, response)
 	}
-	uservehicles, err := c.userService.GetAllUserVehicles(userid)
-	if err != nil {
-		res := utils.NotFound(5)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+
+	loginidParam := context.Query("loginid")
+	if loginidParam == "" {
+		uservehicles, err := c.userService.GetAllUserVehicles(loginid)
+		if err != nil {
+			res := utils.NotFound(5)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusNotFound, response)
+		} else {
+			res := utils.OK(4)
+			response := utils.BuildResponse(res.Message, res.Code, uservehicles)
+			context.JSON(http.StatusOK, response)
+		}
 	} else {
-		res := utils.OK(3)
-		response := utils.BuildResponse(res.Message, res.Code, uservehicles)
-		context.JSON(http.StatusOK, response)
+		uservehicles, err := c.userService.GetAllUserVehicles(loginidParam)
+		if err != nil {
+			res := utils.NotFound(5)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusNotFound, response)
+		} else {
+			res := utils.OK(4)
+			response := utils.BuildResponse(res.Message, res.Code, uservehicles)
+			context.JSON(http.StatusOK, response)
+		}
 	}
 
 }
@@ -222,16 +248,32 @@ func (c *userController) UserDetails(context *gin.Context) {
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusNotFound, response)
 	}
-	user, err := c.userService.GetUserDetails(loginid)
-	if err != nil {
-		res := utils.NotFound(1)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+
+	loginidParam := context.Query("loginid")
+	if loginidParam == "" {
+		user, err := c.userService.GetUserDetails(loginid)
+		if err != nil {
+			res := utils.NotFound(1)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusNotFound, response)
+		} else {
+			res := utils.OK(4)
+			response := utils.BuildResponse(res.Message, res.Code, user)
+			context.JSON(http.StatusOK, response)
+		}
 	} else {
-		res := utils.OK(3)
-		response := utils.BuildResponse(res.Message, res.Code, user)
-		context.JSON(http.StatusOK, response)
+		user, err := c.userService.GetUserDetails(loginidParam)
+		if err != nil {
+			res := utils.NotFound(1)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusNotFound, response)
+		} else {
+			res := utils.OK(4)
+			response := utils.BuildResponse(res.Message, res.Code, user)
+			context.JSON(http.StatusOK, response)
+		}
 	}
+
 }
 
 func (c *userController) AddAddress(context *gin.Context) {

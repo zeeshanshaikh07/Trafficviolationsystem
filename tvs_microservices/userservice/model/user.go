@@ -32,6 +32,7 @@ type Useraddress struct {
 type Uservehicles struct {
 	Uservehicleid uint64 `gorm:"primary_key:auto_increment" json:"uservehicleid"`
 	Userid        uint64 `gorm:"type:bigint(11)" json:"userid"`
+	Loginid       string `gorm:"type:varchar(50)" json:"loginid"`
 	Regno         string `gorm:"type:varchar(30)" json:"regno"`
 	Chassisno     string `gorm:"type:varchar(30)" json:"chassisno"`
 }
@@ -66,6 +67,7 @@ type UpdateuserDTO struct {
 
 type UservehiclesDTO struct {
 	Userid    uint64 `json:"userid,omitempty" form:"userid,omitempty"`
+	Loginid   string `json:"loginid,omitempty" form:"loginid,omitempty"`
 	Regno     string `json:"regno" form:"regno" binding:"required"`
 	Chassisno string `json:"chassisno" form:"chassisno" binding:"required"`
 }
@@ -104,12 +106,13 @@ type UserService interface {
 	IsDuplicateUsername(loginid string) bool
 	IsDuplicateVehicleRegNo(vehregno string) bool
 	AddVehicle(vehicle UservehiclesDTO) (Uservehicles, error)
-	GetAllUserVehicles(userid uint64) ([]Uservehicles, error)
+	GetAllUserVehicles(loginid string) ([]Uservehicles, error)
 	UpdateUserVehicle(Uservehicles UservehiclesupdateDTO, vehregno string) (Uservehicles, error)
 	DeleteUserVehicle(vehicle Uservehicles) error
 	IsAllowedToUpdateDelete(userid uint64, vehicleregno string) (bool, error)
 
 	GetUserDetails(loginid string) (User, error)
+
 	AddUserAddress(address Useraddressdto) (Useraddress, error)
 	GetUserAddress(loginid string) ([]Useraddress, error)
 	GetAllUser(roleid uint64) ([]User, error)
@@ -126,12 +129,13 @@ type UserRepository interface {
 	CheckUsername(loginid string) (tx *gorm.DB)
 	CheckVehicleRegNo(vehregno string) (tx *gorm.DB)
 	AddVehicle(vehicle Uservehicles) (Uservehicles, error)
-	GetVehicles(userid uint64) ([]Uservehicles, error)
+	GetVehicles(loginid string) ([]Uservehicles, error)
 	UpdateUserVehicle(vehicle Uservehicles, vehregno string) (Uservehicles, error)
 	DeleteUserVehicle(vehicle Uservehicles) error
 	FindVehicle(vehicleregno string) (Uservehicles, error)
 
 	GetUserDetails(loginid string) (User, error)
+
 	AddAddress(address Useraddress) (Useraddress, error)
 	GetUserAddress(loginid string) ([]Useraddress, error)
 	GetAllUser(roleid uint64) ([]User, error)

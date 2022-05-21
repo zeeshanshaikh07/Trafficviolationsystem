@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect } from "react";
-import { getViolations } from "../../libs/api";
+import { getAllViolations } from "../../libs/api";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
@@ -12,12 +12,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
 import Card from "../../layouts/Card/Card";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import Modal from "../../layouts/Modal/Modal";
 import FormatDate from "../../utils/FormatDate";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import classes from "../../assets/Styling/Auth.module.css";
+import useInput from "../../hooks/use-input";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
 
 function createData(
   violationid,
@@ -40,41 +42,41 @@ function createData(
     violationdetails: [details],
   };
 }
-
-const options = ["Open", "Close", "All"];
-
+const options = ["city", "state"];
 export default function Violation() {
   const [violations, setViolations] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState();
   const [value, setValue] = React.useState(options[0]);
   const [inputValue, setInputValue] = React.useState("");
-  const [charge, setCharge] = React.useState("");
-  const [code, seCode] = React.useState("");
-  const [name, setName] = React.useState("");
-  const [date, setDate] = React.useState("");
-  const [tvsid, setTvsid] = React.useState("");
-  const [regno, setRegno] = React.useState("");
-
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState();
   const [isViolationEmpty, setIsViolationEmpty] = React.useState(false);
 
-  const [open, setOpen] = React.useState(false);
-  const handleClickOpen = (charge, id, code, name, date, regno) => {
-    setOpen(true);
-    setCharge(charge);
-    setTvsid(id);
-    seCode(code);
-    setName(name);
-    setDate(date);
-    setRegno(regno);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const {
+    value: filtervalue,
+    hasError: filtervalueError,
+    valueIsValid: filtervalueIsValid,
+    reset: filtervalueReset,
+    inputChangeHander: filtervalueInputChangeHander,
+    inputBlurHandler: filtervalueInputBlurHandler,
+  } = useInput((value) => value.trim() !== "");
 
-  useEffect(() => {
-    async function fetchVehicleData() {
-      await getViolations(value).then((data) => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    if (!filtervalueIsValid) {
+      setIsLoading(false);
+      return;
+    }
+
+    filtervalueReset();
+
+    const data = new FormData(event.currentTarget);
+
+    console.log(data.get("filtervalue"));
+    console.log(value);
+
+    await getAllViolations(value, data.get("filtervalue"))
+      .then((data) => {
         if (data.length !== 0) {
           setViolations(data);
           setIsViolationEmpty(false);
@@ -83,13 +85,12 @@ export default function Violation() {
         }
 
         setIsLoading(false);
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        setError("Failed to fetch violations");
       });
-    }
-    fetchVehicleData().catch((err) => {
-      setIsLoading(false);
-      setError("Failed to fetch violations");
-    });
-  }, [value]);
+  };
 
   function Row(props) {
     const { row } = props;
@@ -172,34 +173,6 @@ export default function Violation() {
                         >
                           Description :{violationdetails.description}
                         </TableCell>
-                        <TableCell
-                          style={{
-                            color: "#FFFFFF",
-                          }}
-                        >
-                          {value === "Open" && (
-                            <Button
-                              fullWidth
-                              variant="contained"
-                              style={{
-                                backgroundColor: "#4CD137",
-                                borderRadius: "20px",
-                              }}
-                              onClick={() =>
-                                handleClickOpen(
-                                  violationdetails.charge,
-                                  violationdetails.violationid,
-                                  violationdetails.violationcode,
-                                  violationdetails.violationname,
-                                  violationdetails.violationdate,
-                                  violationdetails.regnumber
-                                )
-                              }
-                            >
-                              Pay
-                            </Button>
-                          )}
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -231,65 +204,66 @@ export default function Violation() {
 
   const searchNSort = (
     <React.Fragment>
-      <input
-        type="text"
-        name="search"
-        placeholder="Search..."
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "20px",
-          width: "20rem",
-          height: "2rem",
-          float: "right",
-          maxWidth: "100%",
-        }}
-      />
-
-      <Autocomplete
-        value={value}
-        onChange={(event, newValue) => {
-          setValue(newValue);
-        }}
-        inputValue={inputValue}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
-        }}
-        id="controllable-states-demo"
-        options={options}
-        sx={{ width: 300 }}
-        renderInput={(params) => (
-          <TextField {...params} label="Violation type" />
-        )}
-      />
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <Grid container spacing={2}>
+          <Grid item xs={7}>
+            <Autocomplete
+              style={{
+                marginTop: "15px",
+              }}
+              size="small"
+              value={value}
+              onChange={(event, newValue) => {
+                setValue(newValue);
+              }}
+              inputValue={inputValue}
+              onInputChange={(event, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+              id="controllable-states-demo"
+              options={options}
+              sx={{ width: 300 }}
+              renderInput={(params) => <TextField {...params} label="Sort" />}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              value={filtervalue}
+              onChange={filtervalueInputChangeHander}
+              onBlur={filtervalueInputBlurHandler}
+              error={filtervalueError}
+              helperText={filtervalueError ? "Please enter value!" : " "}
+              margin="normal"
+              required
+              fullWidth
+              id="filtervalue"
+              label="Name"
+              name="filtervalue"
+              autoComplete="filtervalue"
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ mt: 2.3 }}
+              className={classes.btn}
+            >
+              Search
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
     </React.Fragment>
   );
-
   return (
     <React.Fragment>
       <Topbar>View Violations</Topbar>
-      <Modal
-        isOpen={open}
-        charge={charge}
-        tvsid={tvsid}
-        regno={regno}
-        vname={name}
-        handleClose={handleClose}
-        title="Confirm Payment"
-      >
-        <div
-          style={{
-            textAlign: "center",
-          }}
-        >
-          <h3>Amount : Rs.{charge}</h3>
-          <h3>Date : {FormatDate(date)}</h3>
-          <h3>Violation Name : {name}</h3>
-          <h3>Violation Code : {code}</h3>
-        </div>
-      </Modal>
 
       <Card>
         {searchNSort}
+
         <TableContainer
           style={{
             marginTop: "50px",

@@ -1,28 +1,24 @@
 package middleware
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-//CORSMiddleware ...
-//CORS (Cross-Origin Resource Sharing)
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		fmt.Println("Validating cors")
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost")
-		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, x-access-token")
-		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+func CORS(c *gin.Context) {
 
-		if c.Request.Method == "OPTIONS" {
-			fmt.Println("OPTIONS")
-			c.AbortWithStatus(200)
-		} else {
-			c.Next()
-		}
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "*")
+	c.Header("Access-Control-Allow-Headers", "*")
+	c.Header("Content-Type", "application/json")
+
+	if c.Request.Method != "OPTIONS" {
+
+		c.Next()
+
+	} else {
+
+		c.AbortWithStatus(http.StatusOK)
 	}
 }

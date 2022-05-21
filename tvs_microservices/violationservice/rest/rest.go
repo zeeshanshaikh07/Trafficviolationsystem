@@ -62,7 +62,7 @@ func (c *violationController) GetAllViolations(context *gin.Context) {
 func (c *violationController) GetViolations(context *gin.Context) {
 
 	filter := context.Query("filter")
-	value := context.Query("value")
+	value := context.Query("value") 	
 
 	violationlist, err := c.violationService.GetViolations(filter, value)
 	if err != nil {
