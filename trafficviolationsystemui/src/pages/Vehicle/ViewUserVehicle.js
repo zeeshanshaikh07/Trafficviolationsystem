@@ -22,12 +22,9 @@ export default function ViewUserVehicle(props) {
   const params = useParams();
   const { loginid } = params;
 
-  console.log(loginid);
-
   React.useEffect(() => {
     async function fetchVehicleData() {
       await getAllVehicles(loginid).then((data) => {
-        console.log(data);
         if (data.length !== 0) {
           setVehicledata(data);
 

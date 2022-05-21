@@ -67,8 +67,6 @@ export default function ViewPayments() {
   const params = useParams();
   const { loginid } = params;
 
-  console.log(loginid);
-
   React.useEffect(() => {
     async function fetchPaymentData() {
       await getUserPayment(loginid).then((data) => {

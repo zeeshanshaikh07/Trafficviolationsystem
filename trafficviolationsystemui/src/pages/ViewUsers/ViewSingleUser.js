@@ -24,8 +24,6 @@ export default function ViewSingleUser(props) {
   const params = useParams();
   const { loginid } = params;
 
-  console.log(loginid);
-
   React.useEffect(() => {
     async function fetchVehicleData() {
       await getUserBasicDetails(loginid).then((data) => {
@@ -44,7 +42,6 @@ export default function ViewSingleUser(props) {
     });
   }, [loginid]);
 
-  console.log(userdata);
   if (isLoading) {
     return (
       <section

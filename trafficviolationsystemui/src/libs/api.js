@@ -421,7 +421,5 @@ export async function getAllViolations(filter, value) {
     });
   }
 
-  console.log(loadedViolations);
-
   return loadedViolations;
 }

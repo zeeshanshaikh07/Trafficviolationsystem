@@ -72,9 +72,6 @@ export default function Violation() {
 
     const data = new FormData(event.currentTarget);
 
-    console.log(data.get("filtervalue"));
-    console.log(value);
-
     await getAllViolations(value, data.get("filtervalue"))
       .then((data) => {
         if (data.length !== 0) {

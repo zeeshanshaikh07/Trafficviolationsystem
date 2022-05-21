@@ -142,15 +142,13 @@ export function PaytmButton({ amount, orderid, regno, violationname }) {
               transactiondate: date,
             };
 
-            console.log("PAYMENTDATA", JSON.stringify(paymentData));
-
             await storePayment(paymentData)
               .then(async (res) => {
                 if (res.status_code === 200 || res.status_code === 201) {
                   const violationData = {
                     isclose: 1,
                   };
-                  console.log("violationData", JSON.stringify(violationData));
+
                   await violationClosure(violationData, orderid)
                     .then((res) => {
                       if (res.status_code === 200 || res.status_code === 204) {
