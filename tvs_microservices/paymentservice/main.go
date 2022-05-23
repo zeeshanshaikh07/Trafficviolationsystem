@@ -1,15 +1,14 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-
-	"violationdetails/config"
-	"violationdetails/routes"
+	"paymentMicroservice/config"
+	"paymentMicroservice/routes"
 
 	"github.com/KadirSheikh/tvs_utils/middleware"
 
 	"github.com/KadirSheikh/tvs_utils/utils"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func initialize(r *gin.Engine) {
@@ -17,18 +16,14 @@ func initialize(r *gin.Engine) {
 	var (
 		db *gorm.DB = config.SetupDBConnection(conf)
 	)
-
 	defer config.CloseDBConnection(db)
-	routes.HandleViolationRequests(r, db)
-
+	routes.HandlePaymentRequests(r, db)
 	PORT := conf.Server.Port
 	r.Run(PORT)
 }
 
 func main() {
-
 	r := gin.Default()
-
 	r.Use(middleware.CORS)
 	initialize(r)
 }

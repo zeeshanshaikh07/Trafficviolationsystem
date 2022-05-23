@@ -1,12 +1,12 @@
-module violationdetails
+module paymentMicroservice
 
-go 1.18
-
-require github.com/dgrijalva/jwt-go v3.2.0+incompatible
+go 1.17
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/KadirSheikh/tvs_utils v1.5.0 // indirect
+	github.com/Kshitija2022/tvs_utils v1.0.0 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.7.7 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -24,9 +24,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
-	github.com/zeeshanshaikh07/tvs_utils v1.0.0 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
-	golang.org/x/sys v0.0.0-20220502124256-b6088ccd6cba // indirect
+	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

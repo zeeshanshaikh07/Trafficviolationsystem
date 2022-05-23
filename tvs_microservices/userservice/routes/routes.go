@@ -1,10 +1,11 @@
 package routes
 
 import (
-	"trafficviolationsystem/userservice/middleware"
 	"trafficviolationsystem/userservice/repository"
 	"trafficviolationsystem/userservice/rest"
 	"trafficviolationsystem/userservice/service"
+
+	"github.com/KadirSheikh/tvs_utils/middleware"
 
 	"github.com/KadirSheikh/tvs_utils/utils"
 
@@ -12,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func HandleAuthRequests(r *gin.Engine, db *gorm.DB) {
+func HandleRequests(r *gin.Engine, db *gorm.DB) {
 
 	var (
 		jwt utils.JWT = utils.NewJWTService()
@@ -34,7 +35,7 @@ func HandleAuthRequests(r *gin.Engine, db *gorm.DB) {
 		routes.GET("/", middleware.AuthorizeJWT(jwt), userController.UserDetails)
 		routes.POST("/address", middleware.AuthorizeJWT(jwt), userController.AddAddress)
 		routes.GET("/address", middleware.AuthorizeJWT(jwt), userController.GetAddress)
-		routes.PUT("/reset", middleware.AuthorizeJWT(jwt), userController.ResetPassword)
+		routes.PUT("/reset", userController.ResetPassword)
 		routes.PUT("/", middleware.AuthorizeJWT(jwt), userController.UpdateUserDetails)
 		routes.PUT("/address/:addressid", userController.UpdateUserAddress)
 

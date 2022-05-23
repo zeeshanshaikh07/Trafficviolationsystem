@@ -1,9 +1,9 @@
 [database]
-server="127.0.0.1"
+server="localhost"
 port="3306"
 name="trafficviolationsystem"
 user="root"
-password="root123"
+password=""
 
 [server]
 port="9001"

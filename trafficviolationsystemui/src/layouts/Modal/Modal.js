@@ -16,6 +16,7 @@ export default function Modal({
   charge,
   tvsid,
   regno,
+  vname,
 }) {
   const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     "& .MuiDialogContent-root": {
@@ -69,7 +70,12 @@ export default function Modal({
       </BootstrapDialogTitle>
       <DialogContent dividers>{children}</DialogContent>
       <DialogActions>
-        <PaytmButton amount={charge} orderid={tvsid} regno={regno}>
+        <PaytmButton
+          violationname={vname}
+          amount={charge}
+          orderid={tvsid}
+          regno={regno}
+        >
           Confirm
         </PaytmButton>
         <Button

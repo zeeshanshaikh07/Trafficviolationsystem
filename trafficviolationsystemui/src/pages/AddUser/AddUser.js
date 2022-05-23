@@ -2,7 +2,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import { register } from "../../libs/api";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+
 import { Fragment } from "react";
 import useInput from "../../hooks/use-input";
 import Alert from "@mui/material/Alert";
@@ -11,14 +11,14 @@ import classes from "../../assets/Styling/Auth.module.css";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
+
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+
 import Container from "@mui/material/Container";
 
 const theme = createTheme();
 
-export default function SignIn() {
+export default function AddUser() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -100,12 +100,19 @@ export default function SignIn() {
     }
 
     const data = new FormData(event.currentTarget);
+    let roleid;
+
+    if (localStorage.getItem("roleid") === "1") {
+      roleid = 2;
+    } else if (localStorage.getItem("roleid") === "2") {
+      roleid = 3;
+    }
 
     const userData = {
-      roleid: 3,
+      roleid: roleid,
       loginid: data.get("loginid"),
       fullname: data.get("fullname"),
-      createdby: "Self-Registered",
+      createdby: localStorage.getItem("loginid"),
       emailid: data.get("emailid"),
       mobileno: data.get("mobileno"),
       dob: data.get("dob"),
@@ -119,7 +126,7 @@ export default function SignIn() {
           setIsLoading(false);
           setSuccess(res.message);
           setTimeout(() => {
-            navigate("/violations");
+            navigate("/viewusers");
             window.location.reload();
           }, 500);
         } else {
@@ -134,9 +141,9 @@ export default function SignIn() {
 
   return (
     <Fragment>
-      <Topbar>Sign Up</Topbar>
+      <Topbar>Add User</Topbar>
       <ThemeProvider theme={theme}>
-        {isLoading && <Alert severity="info">Signing in...</Alert>}
+        {isLoading && <Alert severity="info">Adding...</Alert>}
 
         {!isLoading && success === "" && error !== "" && (
           <Alert severity="error">{error}</Alert>
@@ -160,23 +167,6 @@ export default function SignIn() {
               alignItems: "center",
             }}
           >
-            <Typography
-              className={classes.auth_title}
-              component="h1"
-              variant="h4"
-            >
-              Sign Up
-            </Typography>
-            <Typography
-              style={{
-                fontSize: "15px",
-              }}
-              sx={{ mt: 3, mb: 3 }}
-              component="h6"
-              variant="h6"
-            >
-              Register to Traffic Violation System
-            </Typography>
             <Box
               component="form"
               onSubmit={handleSubmit}
@@ -303,13 +293,8 @@ export default function SignIn() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign Up
+                Add
               </Button>
-              <Grid container>
-                <Grid item sx={{ mb: 2 }}>
-                  <Link to="/">Already have an account?Sign In</Link>
-                </Grid>
-              </Grid>
             </Box>
           </Box>
         </Container>

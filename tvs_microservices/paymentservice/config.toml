@@ -1,4 +1,4 @@
-# filename: config.toml
+
 [database]
 host = "localhost"
 database = "trafficviolationsystem"
@@ -7,7 +7,7 @@ password = ""
 secret = "trafficviolationsystemjwt"
 
 [server]
-port = ":8000"
+port =":9003"
 
 [servicecommunication]
 port="5000"

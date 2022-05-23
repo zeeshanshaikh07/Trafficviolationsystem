@@ -98,7 +98,7 @@ func (c *violationController) CloseViolation(context *gin.Context) {
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusNotFound, response)
 	} else {
-		res := utils.Updated()
+		res := utils.OK(1)
 		response := utils.BuildResponse(res.Message, res.Code, violationclose)
 		context.JSON(http.StatusOK, response)
 

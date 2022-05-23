@@ -215,7 +215,7 @@ export default function Address(props) {
                   helperText={stateError ? "Please enter state" : " "}
                   required
                   fullWidth
-                  label="state"
+                  label="State"
                   name="state"
                   type="text"
                   size="small"

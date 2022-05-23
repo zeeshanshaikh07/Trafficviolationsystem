@@ -1,9 +1,12 @@
 [database]
 host = "localhost"
-database = "tvs_test"
+database = "trafficviolationsystem"
 user = "root"
 password = ""
 secret = "trafficviolationsystemjwt"
 
 [server]
-port = ":8002"
+port = ":9002"
+
+[servicecommunication]
+port="5000"

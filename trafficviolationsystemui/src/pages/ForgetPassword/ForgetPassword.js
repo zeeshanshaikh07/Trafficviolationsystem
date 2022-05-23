@@ -1,22 +1,18 @@
-import { Link } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
-import { login } from "../../libs/api";
+import { resetPassword } from "../../libs/api";
 import { useNavigate } from "react-router-dom";
 import { Fragment } from "react";
 import useInput from "../../hooks/use-input";
-import Topbar from "../../layouts/Topbar/Topbar";
-import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
+import Topbar from "../../layouts/Topbar/Topbar";
+import classes from "../../assets/Styling/Auth.module.css";
+import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import classes from "../../assets/Styling/Auth.module.css";
 
 const theme = createTheme();
 
@@ -27,11 +23,11 @@ export default function SignIn() {
 
   const navigate = useNavigate();
 
+  const [isMatch, setIsMatch] = useState(false);
   const {
     value: loginid,
     hasError: loginidError,
     valueIsValid: loginidIsValid,
-    reset: loginidReset,
     inputChangeHander: loginidInputChangeHander,
     inputBlurHandler: loginidInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
@@ -40,10 +36,17 @@ export default function SignIn() {
     value: password,
     hasError: passwordError,
     valueIsValid: passwordIsValid,
-    reset: passwordReset,
     inputChangeHander: passwordInputChangeHander,
     inputBlurHandler: passwordInputBlurHandler,
-  } = useInput((value) => value.trim() !== "");
+  } = useInput((value) => value.trim().length >= 5);
+
+  const cpasswordInputChangeHander = (event) => {
+    if (event.target.value !== password) {
+      setIsMatch(true);
+    } else {
+      setIsMatch(false);
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -51,36 +54,26 @@ export default function SignIn() {
 
     if (!loginidIsValid || !passwordIsValid) {
       setIsLoading(false);
+
       return;
     }
 
-    loginidReset();
-    passwordReset();
-
     const data = new FormData(event.currentTarget);
 
-    const userData = {
+    const passData = {
       loginid: data.get("loginid"),
       password: data.get("password"),
     };
 
-    await login(userData)
+    await resetPassword(passData)
       .then((res) => {
         if (res.status_code === 200) {
-          console.log(res);
           setIsLoading(false);
           setSuccess(res.message);
-          if (res.data.roleid === 2 || res.data.roleid === 1) {
-            setTimeout(() => {
-              navigate("/allviolations");
-              window.location.reload();
-            }, 500);
-          } else if (res.data.roleid === 3) {
-            setTimeout(() => {
-              navigate("/violations");
-              window.location.reload();
-            }, 500);
-          }
+          setTimeout(() => {
+            navigate("/");
+            window.location.reload();
+          }, 500);
         } else {
           setIsLoading(false);
           setError(res.message);
@@ -93,9 +86,9 @@ export default function SignIn() {
 
   return (
     <Fragment>
-      <Topbar>Sign In</Topbar>
+      <Topbar>Forget Password</Topbar>
       <ThemeProvider theme={theme}>
-        {isLoading && <Alert severity="info">Signing in...</Alert>}
+        {isLoading && <Alert severity="info">Loading...</Alert>}
 
         {!isLoading && success === "" && error !== "" && (
           <Alert severity="error">{error}</Alert>
@@ -104,10 +97,9 @@ export default function SignIn() {
         {!isLoading && success !== "" && (
           <Alert severity="success">{success}</Alert>
         )}
-
         <Container
-          sx={{ mt: 3 }}
           className={classes.signin}
+          sx={{ mt: 3, mb: 3 }}
           component="main"
           maxWidth="xs"
         >
@@ -125,17 +117,7 @@ export default function SignIn() {
               component="h1"
               variant="h4"
             >
-              Sign In
-            </Typography>
-            <Typography
-              style={{
-                fontSize: "15px",
-              }}
-              sx={{ mt: 3, mb: 3 }}
-              component="h6"
-              variant="h6"
-            >
-              Login to Traffic Violation System
+              Reset Password
             </Typography>
             <Box
               component="form"
@@ -154,6 +136,7 @@ export default function SignIn() {
                 fullWidth
                 id="loginid"
                 label="Username"
+                type="text"
                 name="loginid"
                 autoComplete="loginid"
                 autoFocus
@@ -164,7 +147,11 @@ export default function SignIn() {
                 onChange={passwordInputChangeHander}
                 onBlur={passwordInputBlurHandler}
                 error={passwordError}
-                helperText={passwordError ? "Please enter password!" : " "}
+                helperText={
+                  passwordError
+                    ? "Please enter password of atleast 5 characters!"
+                    : " "
+                }
                 margin="normal"
                 required
                 fullWidth
@@ -174,39 +161,29 @@ export default function SignIn() {
                 id="password"
                 autoComplete="current-password"
               />
-
-              <Grid container>
-                <Grid
-                  item
-                  xs
-                  sx={{
-                    marginTop: 1,
-                  }}
-                ></Grid>
-                <Grid
-                  item
-                  sx={{
-                    marginTop: 2,
-                  }}
-                >
-                  <Link to="/forgetpassword">Forgot password?</Link>
-                </Grid>
-              </Grid>
+              <TextField
+                onChange={cpasswordInputChangeHander}
+                error={isMatch}
+                helperText={isMatch ? "Password do not matched!" : " "}
+                margin="normal"
+                required
+                fullWidth
+                name="cpassword"
+                label="Confirm password"
+                type="password"
+                id="cpassword"
+                autoComplete="cpassword"
+              />
 
               <Button
+                className={classes.btn}
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
-                className={classes.btn}
               >
-                Sign In
+                Reset
               </Button>
-              <Grid container>
-                <Grid item sx={{ mb: 2 }}>
-                  <Link to="/signup">Don't have an account? Sign Up</Link>
-                </Grid>
-              </Grid>
             </Box>
           </Box>
         </Container>

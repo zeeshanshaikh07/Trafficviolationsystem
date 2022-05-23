@@ -71,11 +71,6 @@ export default function ResetPassword() {
       .catch((error) => {
         setError(error.message);
       });
-
-    // {
-    //   "loginid":"Kadir03",
-    //   "password":"1234560987"
-    // }
   };
 
   return (
