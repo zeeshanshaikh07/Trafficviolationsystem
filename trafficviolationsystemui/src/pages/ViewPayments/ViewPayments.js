@@ -116,29 +116,10 @@ export default function ViewPayments() {
     setPage(0);
   };
 
-  const searchNSort = (
-    <React.Fragment>
-      <input
-        type="text"
-        name="search"
-        placeholder="Search..."
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "20px",
-          width: "20rem",
-          height: "2rem",
-          float: "right",
-          maxWidth: "100%",
-          marginBottom: "50px",
-        }}
-      />
-    </React.Fragment>
-  );
   return (
     <React.Fragment>
       <Topbar>User Payment</Topbar>
       <Card>
-        {searchNSort}
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table">

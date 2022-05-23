@@ -67,12 +67,20 @@ export default function SignIn() {
     await login(userData)
       .then((res) => {
         if (res.status_code === 200) {
+          console.log(res);
           setIsLoading(false);
           setSuccess(res.message);
-          setTimeout(() => {
-            navigate("/violations");
-            window.location.reload();
-          }, 500);
+          if (res.data.roleid === 2 || res.data.roleid === 1) {
+            setTimeout(() => {
+              navigate("/allviolations");
+              window.location.reload();
+            }, 500);
+          } else if (res.data.roleid === 3) {
+            setTimeout(() => {
+              navigate("/violations");
+              window.location.reload();
+            }, 500);
+          }
         } else {
           setIsLoading(false);
           setError(res.message);
@@ -174,12 +182,7 @@ export default function SignIn() {
                   sx={{
                     marginTop: 1,
                   }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" />}
-                    label="Remember me"
-                  />
-                </Grid>
+                ></Grid>
                 <Grid
                   item
                   sx={{

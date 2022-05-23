@@ -25,7 +25,6 @@ export default function AddAddress(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [success, setSuccess] = React.useState("");
   const [error, setError] = React.useState("");
-  // const [isPermanentStatus, setIsPermanent] = useState(props.status);
 
   const [age, setAge] = React.useState("");
 

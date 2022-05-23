@@ -1,11 +1,12 @@
 package routes
 
 import (
-	"violationdetails/middleware"
 	"violationdetails/model"
 	"violationdetails/repository"
 	controller "violationdetails/rest"
 	"violationdetails/service"
+
+	"github.com/KadirSheikh/tvs_utils/middleware"
 
 	"github.com/KadirSheikh/tvs_utils/utils"
 

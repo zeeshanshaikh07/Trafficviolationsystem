@@ -41,6 +41,16 @@ export default function BasicDetails(props) {
 
     const data = new FormData(event.currentTarget);
 
+    if (
+      data.get("loginid").length === 0 ||
+      data.get("fullname").length === 0 ||
+      data.get("emailid").length === 0 ||
+      data.get("mobileno").length === 0 ||
+      data.get("DOB").length === 0
+    ) {
+      return;
+    }
+
     const uuserData = {
       loginid: data.get("loginid"),
       fullname: data.get("fullname"),
@@ -122,8 +132,6 @@ export default function BasicDetails(props) {
                   InputLabelProps={{ shrink: true }}
                   value={userdata.loginid}
                   onChange={changeHandler}
-                  // error={usernameError}
-                  // helperText={usernameError ? "Please enter username!" : " "}
                   required
                   fullWidth
                   id="loginid"
@@ -138,8 +146,6 @@ export default function BasicDetails(props) {
                   InputLabelProps={{ shrink: true }}
                   value={userdata.fullname}
                   onChange={changeHandler}
-                  // error={fullnameError}
-                  // helperText={fullnameError ? "Please enter full name!" : " "}
                   required
                   fullWidth
                   name="fullname"
@@ -155,10 +161,6 @@ export default function BasicDetails(props) {
                   InputLabelProps={{ shrink: true }}
                   value={userdata.emailid}
                   onChange={changeHandler}
-                  // error={emailidError}
-                  // helperText={
-                  //   emailidError ? "Please enter a valid email address!" : " "
-                  // }
                   required
                   fullWidth
                   name="emailid"
@@ -175,10 +177,6 @@ export default function BasicDetails(props) {
                   InputLabelProps={{ shrink: true }}
                   value={userdata.mobileno}
                   onChange={changeHandler}
-                  // error={mobilenoError}
-                  // helperText={
-                  //   mobilenoError ? "Please enter valid mobile number!" : " "
-                  // }
                   required
                   fullWidth
                   name="mobileno"
@@ -198,8 +196,6 @@ export default function BasicDetails(props) {
                   InputLabelProps={{ shrink: true }}
                   value={FormatDate(userdata.DOB)}
                   onChange={changeHandler}
-                  // error={dobError}
-                  // helperText={dobError ? "Please enter date of birth!" : " "}
                   required
                   fullWidth
                   label="DOB"

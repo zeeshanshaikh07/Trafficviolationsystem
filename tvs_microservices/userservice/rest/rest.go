@@ -12,6 +12,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/go-resty/resty/v2"
 )
 
 type userController struct {
@@ -86,6 +88,7 @@ func (c *userController) Register(ctx *gin.Context) {
 }
 
 func (c *userController) AddVehicle(context *gin.Context) {
+	client := resty.New()
 	var userVehicleDTO model.UservehiclesDTO
 	errDTO := context.ShouldBind(&userVehicleDTO)
 	if errDTO != nil {
@@ -125,15 +128,36 @@ func (c *userController) AddVehicle(context *gin.Context) {
 			userVehicleDTO.Loginid = loginid
 		}
 
-		result, err := c.userService.AddVehicle(userVehicleDTO)
+		vToken := c.jwt.GenerateServiceValidationToken(userVehicleDTO.Chassisno, userVehicleDTO.Regno)
+		resp, err := client.R().
+			SetQueryParams(map[string]string{
+				"vehicleregno": userVehicleDTO.Regno,
+			}).
+			SetHeader("Authorization", vToken).
+			Get("http://localhost:9001/api/v1/vehicle/registration")
+
 		if err != nil {
-			res := utils.BadRequest()
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
+			fmt.Println("code : ", utils.StatusCodes[utils.ErrInvalidAuthorizeHeader], utils.ErrInvalidAuthorizeHeader)
+
+		}
+
+		if resp.StatusCode() == http.StatusOK {
+			result, err := c.userService.AddVehicle(userVehicleDTO)
+
+			if err != nil {
+				res := utils.BadRequest()
+				response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+				context.JSON(http.StatusBadRequest, response)
+			} else {
+				result.Vtoken = vToken
+				res := utils.Created(1)
+				response := utils.BuildResponse(res.Message, res.Code, result)
+				context.JSON(http.StatusCreated, response)
+			}
 		} else {
-			res := utils.Created(1)
-			response := utils.BuildResponse(res.Message, res.Code, result)
-			context.JSON(http.StatusCreated, response)
+
+			response := utils.BuildResponse("Invalid Vehicle", resp.StatusCode(), utils.EmptyObj{})
+			context.JSON(http.StatusBadRequest, response)
 		}
 
 	}
@@ -330,16 +354,32 @@ func (c *userController) GetAddress(context *gin.Context) {
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
 	}
-	address, err := c.userService.GetUserAddress(loginid)
-	if err != nil {
-		res := utils.NotFound(4)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+
+	loginidParam := context.Query("loginid")
+	if loginidParam == "" {
+		address, err := c.userService.GetUserAddress(loginid)
+		if err != nil {
+			res := utils.NotFound(4)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusBadRequest, response)
+		} else {
+			res := utils.OK(3)
+			response := utils.BuildResponse(res.Message, res.Code, address)
+			context.JSON(http.StatusOK, response)
+		}
 	} else {
-		res := utils.OK(3)
-		response := utils.BuildResponse(res.Message, res.Code, address)
-		context.JSON(http.StatusOK, response)
+		address, err := c.userService.GetUserAddress(loginidParam)
+		if err != nil {
+			res := utils.NotFound(4)
+			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+			context.JSON(http.StatusBadRequest, response)
+		} else {
+			res := utils.OK(3)
+			response := utils.BuildResponse(res.Message, res.Code, address)
+			context.JSON(http.StatusOK, response)
+		}
 	}
+
 }
 
 func (c *userController) GetAllUsers(context *gin.Context) {

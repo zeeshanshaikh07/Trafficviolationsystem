@@ -16,8 +16,6 @@ func initializeComponents(r *gin.Engine, conf *utils.Config) {
 	//Get db object
 	gormCon := db.InitializeDbConnection(conf)
 
-	// r.Use(middleware.CORSMiddleware())
-
 	r.Use(middleware.AuthMiddleware(service.NewJWTService(conf.AuthInfo.Secrekey)))
 
 	routes.HandleRegistrationRequests(r, gormCon)

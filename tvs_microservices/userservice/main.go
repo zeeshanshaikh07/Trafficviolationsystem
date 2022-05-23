@@ -2,8 +2,9 @@ package main
 
 import (
 	"trafficviolationsystem/userservice/config"
-	"trafficviolationsystem/userservice/middleware"
 	"trafficviolationsystem/userservice/routes"
+
+	"github.com/KadirSheikh/tvs_utils/middleware"
 
 	"github.com/KadirSheikh/tvs_utils/utils"
 

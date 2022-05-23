@@ -62,7 +62,7 @@ func (c *violationController) GetAllViolations(context *gin.Context) {
 func (c *violationController) GetViolations(context *gin.Context) {
 
 	filter := context.Query("filter")
-	value := context.Query("value") 	
+	value := context.Query("value")
 
 	violationlist, err := c.violationService.GetViolations(filter, value)
 	if err != nil {
@@ -98,7 +98,7 @@ func (c *violationController) CloseViolation(context *gin.Context) {
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusNotFound, response)
 	} else {
-		res := utils.Updated()
+		res := utils.OK(1)
 		response := utils.BuildResponse(res.Message, res.Code, violationclose)
 		context.JSON(http.StatusOK, response)
 

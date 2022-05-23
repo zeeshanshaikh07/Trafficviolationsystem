@@ -16,7 +16,7 @@ const theme = createTheme();
 export default function ViewUserVehicle(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState("");
-
+  const [isVehicleEmpty, setIsVehicleEmpty] = React.useState(false);
   const [vehicledata, setVehicledata] = React.useState([]);
 
   const params = useParams();
@@ -27,9 +27,10 @@ export default function ViewUserVehicle(props) {
       await getAllVehicles(loginid).then((data) => {
         if (data.length !== 0) {
           setVehicledata(data);
-
+          setIsVehicleEmpty(false);
           setIsLoading(false);
         } else {
+          setIsVehicleEmpty(true);
           setIsLoading(false);
         }
       });
@@ -57,6 +58,7 @@ export default function ViewUserVehicle(props) {
     <Fragment>
       <ThemeProvider theme={theme}>
         <Topbar>User Vehicles</Topbar>
+
         {error && (
           <section
             style={{
@@ -68,10 +70,20 @@ export default function ViewUserVehicle(props) {
             <p>{error}</p>
           </section>
         )}
-
+        {isVehicleEmpty && (
+          <section
+            style={{
+              textAlign: "center",
+              fontSize: "20px",
+              color: "red",
+            }}
+          >
+            <p>No vehicle added.</p>
+          </section>
+        )}
         {vehicledata.map((vehicle) => (
           <Card>
-            {!isLoading && !error && (
+            {!isLoading && !error && !isVehicleEmpty && (
               <Box component="form" noValidate sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={5}>
@@ -98,7 +110,7 @@ export default function ViewUserVehicle(props) {
                           textDecoration: "none",
                           color: "white",
                         }}
-                        to=""
+                        to={`/vehicles/${vehicle.regno}`}
                       >
                         View details
                       </Link>

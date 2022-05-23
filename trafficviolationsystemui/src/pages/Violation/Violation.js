@@ -231,20 +231,6 @@ export default function Violation() {
 
   const searchNSort = (
     <React.Fragment>
-      <input
-        type="text"
-        name="search"
-        placeholder="Search..."
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "20px",
-          width: "20rem",
-          height: "2rem",
-          float: "right",
-          maxWidth: "100%",
-        }}
-      />
-
       <Autocomplete
         value={value}
         onChange={(event, newValue) => {

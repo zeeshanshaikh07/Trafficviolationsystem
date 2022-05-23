@@ -29,35 +29,39 @@ export default function Profile() {
     <Fragment>
       <ThemeProvider theme={theme}>
         <Topbar>User Profile</Topbar>
-        <Button
-          style={{
-            backgroundColor: "#313082",
-            float: "right",
-            border: "none",
-            color: "white",
-            borderRadius: "20px",
-            padding: "10px 30px",
-            marginRight: "30px",
-            marginTop: "30px",
-          }}
-          variant="contained"
-        >
-          <Link
+        {localStorage.getItem("roleid") === 3 && (
+          <Button
             style={{
-              textDecoration: "none",
+              backgroundColor: "#313082",
+              float: "right",
+              border: "none",
               color: "white",
+              borderRadius: "20px",
+              padding: "10px 30px",
+              marginRight: "30px",
+              marginTop: "30px",
             }}
-            to="/addadress"
+            variant="contained"
           >
-            Add address
-          </Link>
-        </Button>
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "white",
+              }}
+              to="/addadress"
+            >
+              Add address
+            </Link>
+          </Button>
+        )}
+
         <div
           style={{
             marginTop: "100px",
           }}
         >
           <BasicDetails></BasicDetails>
+
           {addressdata.map((add) => (
             <Address
               key={add.addressid}

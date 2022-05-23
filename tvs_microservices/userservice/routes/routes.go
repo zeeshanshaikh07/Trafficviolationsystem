@@ -1,10 +1,11 @@
 package routes
 
 import (
-	"trafficviolationsystem/userservice/middleware"
 	"trafficviolationsystem/userservice/repository"
 	"trafficviolationsystem/userservice/rest"
 	"trafficviolationsystem/userservice/service"
+
+	"github.com/KadirSheikh/tvs_utils/middleware"
 
 	"github.com/KadirSheikh/tvs_utils/utils"
 

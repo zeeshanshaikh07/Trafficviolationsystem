@@ -100,12 +100,19 @@ export default function AddUser() {
     }
 
     const data = new FormData(event.currentTarget);
+    let roleid;
+
+    if (localStorage.getItem("roleid") === "1") {
+      roleid = 2;
+    } else if (localStorage.getItem("roleid") === "2") {
+      roleid = 3;
+    }
 
     const userData = {
-      roleid: 3,
+      roleid: roleid,
       loginid: data.get("loginid"),
       fullname: data.get("fullname"),
-      createdby: null,
+      createdby: localStorage.getItem("loginid"),
       emailid: data.get("emailid"),
       mobileno: data.get("mobileno"),
       dob: data.get("dob"),
@@ -136,7 +143,7 @@ export default function AddUser() {
     <Fragment>
       <Topbar>Add User</Topbar>
       <ThemeProvider theme={theme}>
-        {isLoading && <Alert severity="info">Adding User...</Alert>}
+        {isLoading && <Alert severity="info">Adding...</Alert>}
 
         {!isLoading && success === "" && error !== "" && (
           <Alert severity="error">{error}</Alert>

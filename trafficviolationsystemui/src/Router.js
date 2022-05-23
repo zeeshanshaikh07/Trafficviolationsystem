@@ -6,6 +6,7 @@ import Vehicle from "./pages/Vehicle/Vehicle";
 import ViewUserVehicle from "./pages/Vehicle/ViewUserVehicle";
 import VehicleSummary from "./pages/Vehicle/VehicleSummary";
 import Navbar from "./layouts/Navbar/Navbar";
+import Footer from "./layouts/Footer/Footer";
 import ViewAllViolation from "./pages/Violation/ViewAllViolation";
 import Violation from "./pages/Violation/Violation";
 import PaymentSuccess from "./pages/PaymentResponse/PaymentSuccess";
@@ -20,6 +21,7 @@ import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
 
 function Router() {
   const isAuthenticated = !!localStorage.getItem("token");
+  const role = localStorage.getItem("roleid");
 
   return (
     <Fragment>
@@ -30,7 +32,9 @@ function Router() {
         <Route path="/signup" element={<SignUp />} />
         <Route
           path="/vehicles"
-          element={isAuthenticated ? <Vehicle /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && role === "3" ? <Vehicle /> : <Navigate to="/" />
+          }
         />
         <Route
           path="/vehicles/:vehicleregno"
@@ -38,7 +42,13 @@ function Router() {
         />
         <Route
           path="/violations"
-          element={isAuthenticated ? <Violation /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && role === "3" ? (
+              <Violation />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
           path="/profile"
@@ -46,15 +56,33 @@ function Router() {
         />
         <Route
           path="/paymentsuccess"
-          element={isAuthenticated ? <PaymentSuccess /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && role === "3" ? (
+              <PaymentSuccess />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
           path="/paymentfailure"
-          element={isAuthenticated ? <PaymentFailure /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && role === "3" ? (
+              <PaymentFailure />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
         <Route
           path="/addadress"
-          element={isAuthenticated ? <AddAddress /> : <Navigate to="/" />}
+          element={
+            isAuthenticated && role === "3" ? (
+              <AddAddress />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
 
         <Route
@@ -87,6 +115,7 @@ function Router() {
           element={isAuthenticated ? <ViewAllViolation /> : <Navigate to="/" />}
         />
       </Routes>
+      <Footer />
     </Fragment>
   );
 }

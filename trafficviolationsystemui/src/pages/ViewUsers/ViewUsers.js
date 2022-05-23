@@ -34,14 +34,27 @@ const columns = [
     minWidth: 80,
   },
   {
+    id: "createdby",
+    label: "Created by",
+    minWidth: 80,
+  },
+  {
     id: "view",
     label: "View Details",
     minWidth: 80,
   },
 ];
 
-function createData(username, fulname, emailid, mobileno, role, view) {
-  return { username, fulname, emailid, mobileno, role, view };
+function createData(
+  username,
+  fulname,
+  emailid,
+  mobileno,
+  role,
+  createdby,
+  view
+) {
+  return { username, fulname, emailid, mobileno, role, createdby, view };
 }
 
 const options = ["Users", "Admins"];
@@ -100,6 +113,7 @@ export default function ViewUsers() {
         users[key].emailid,
         users[key].mobileno,
         role,
+        users[key].createdby,
         <Button variant="contained">
           <Link
             style={{
@@ -116,21 +130,6 @@ export default function ViewUsers() {
   }
   const searchNSort = (
     <React.Fragment>
-      <input
-        type="text"
-        name="search"
-        placeholder="Search..."
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "20px",
-          width: "20rem",
-          height: "2rem",
-          float: "right",
-          maxWidth: "100%",
-          marginBottom: "50px",
-        }}
-      />
-
       <Autocomplete
         value={value}
         onChange={(event, newValue) => {
@@ -150,6 +149,7 @@ export default function ViewUsers() {
   return (
     <React.Fragment>
       <Topbar>Users List</Topbar>
+
       <Button
         style={{
           backgroundColor: "#313082",
@@ -170,16 +170,18 @@ export default function ViewUsers() {
           }}
           to="/adduser"
         >
-          Add user
+          {localStorage.getItem("roleid") === "2" && <span>Add user</span>}
+          {localStorage.getItem("roleid") === "1" && <span>Add admin</span>}
         </Link>
       </Button>
+
       <div
         style={{
           marginTop: "100px",
         }}
       >
         <Card>
-          {searchNSort}
+          {localStorage.getItem("roleid") === "1" && searchNSort}
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader aria-label="sticky table">
@@ -257,7 +259,7 @@ export default function ViewUsers() {
                   color: "red",
                 }}
               >
-                <p>No User found.</p>
+                <p>No user found.</p>
               </section>
             )}
             <TablePagination

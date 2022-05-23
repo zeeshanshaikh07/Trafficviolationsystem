@@ -12,6 +12,8 @@ import { useParams } from "react-router-dom";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
+import { getUserAddress } from "../../libs/api";
+import Address from "../Profile/Address";
 
 const theme = createTheme();
 
@@ -23,6 +25,27 @@ export default function ViewSingleUser(props) {
 
   const params = useParams();
   const { loginid } = params;
+
+  const [addressdata, setAddressdata] = React.useState([]);
+
+  React.useEffect(() => {
+    async function fetchVehicleData() {
+      await getUserAddress(loginid).then((data) => {
+        if (data.length !== 0) {
+          setAddressdata(data);
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+        }
+      });
+    }
+    fetchVehicleData().catch((err) => {
+      setIsLoading(false);
+      setError(err.message);
+    });
+  }, [loginid]);
+
+  console.log(addressdata);
 
   React.useEffect(() => {
     async function fetchVehicleData() {
@@ -110,18 +133,18 @@ export default function ViewSingleUser(props) {
             marginTop: "100px",
           }}
         >
+          {error && (
+            <section
+              style={{
+                textAlign: "center",
+                fontSize: "20px",
+                color: "red",
+              }}
+            >
+              <p>{error}</p>
+            </section>
+          )}
           <Card>
-            {error && (
-              <section
-                style={{
-                  textAlign: "center",
-                  fontSize: "20px",
-                  color: "red",
-                }}
-              >
-                <p>{error}</p>
-              </section>
-            )}
             {!isLoading && !error && (
               <Container
                 border={3}
@@ -181,6 +204,63 @@ export default function ViewSingleUser(props) {
               </Container>
             )}
           </Card>
+          {addressdata.map((add) => (
+            <Card>
+              {!isLoading && !error && (
+                <Container
+                  border={3}
+                  display="flex"
+                  color="gray"
+                  fontSize={15}
+                  component="form"
+                  noValidate
+                >
+                  <CssBaseline />
+                  <Grid
+                    container
+                    spacing={1}
+                    justify="space-between"
+                    alignItems="stretch"
+                    className={classes.outline}
+                  >
+                    <Grid item xs={12}>
+                      <h2
+                        style={{
+                          color: "black",
+                          textAlign: "left",
+                          fontWeight: "regular",
+                          fontStyle: "normal",
+                        }}
+                      >
+                        {add.addresstype} Address
+                      </h2>
+                    </Grid>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={4}>
+                          <h4>House Number : {add.houseno}</h4>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <h4>Area Name : {add.areaname}</h4>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <h4>Pincode : {add.pincode}</h4>
+                        </Grid>
+                      </Grid>
+                      <Grid container spacing={2}>
+                        <Grid item xs={4}>
+                          <h4>City : {add.DOB}</h4>
+                        </Grid>
+                        <Grid item xs={4}>
+                          <h4>State : {add.state}</h4>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                </Container>
+              )}
+            </Card>
+          ))}
         </div>
       </ThemeProvider>
     </Fragment>

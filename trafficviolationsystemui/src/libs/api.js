@@ -1,6 +1,6 @@
 const ROOT_ROUTE_USERS = "http://localhost:8000/api/v1/users";
 const ROOT_ROUTE_VEHICLES = "http://localhost:9001/api/v1/vehicle";
-const ROOT_ROUTE_VIOLATIONS = "http://localhost:8002/api/v1/violation";
+const ROOT_ROUTE_VIOLATIONS = "http://localhost:9002/api/v1/violation";
 const ROOT_ROUTE_PAYMENTS = "http://localhost:9003/api/v1/payments";
 
 const setItem = (token, roleid, loginid) => {
@@ -36,7 +36,7 @@ export async function register(userData) {
     },
   });
   const resData = await response.json();
-  if (resData.status_code === 200) {
+  if (resData.status_code === 201) {
     setItem(resData.data.token, resData.data.roleid, resData.data.loginid);
   }
   return resData;
@@ -52,6 +52,9 @@ export async function addVehicle(vehicleData) {
     },
   });
   const resData = await response.json();
+  if (resData.status_code === 201 || resData.status_code === 200) {
+    localStorage.setItem("vtoken", resData.data.vtoken);
+  }
 
   return resData;
 }
@@ -129,11 +132,12 @@ export async function getVehicleSummary(vehicleregno) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token"),
+        Authorization: localStorage.getItem("vtoken"),
       },
     }
   );
 
+  console.log(response);
   return response;
 }
 
@@ -282,6 +286,26 @@ export async function getAddress() {
   }
 }
 
+export async function getUserAddress(loginid) {
+  const response = await fetch(
+    `${ROOT_ROUTE_USERS}/address?loginid=${loginid}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token"),
+      },
+    }
+  );
+  const resData = await response.json();
+  if (resData.status_code === 200) {
+    const addData = resData.data;
+    return addData;
+  } else {
+    return [];
+  }
+}
+
 export async function updateBasicDetails(userData) {
   const response = await fetch(`${ROOT_ROUTE_USERS}/`, {
     method: "PUT",
@@ -388,15 +412,17 @@ export async function getUserBasicDetails(loginid) {
 
 export async function getAllViolations(filter, value) {
   let loadedViolations = [];
-  let violationUrl = `http://localhost:8002/api/v1/violation/mode?filter=${filter}&value=${value}`;
 
-  const response = await fetch(violationUrl, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: localStorage.getItem("token"),
-    },
-  });
+  const response = await fetch(
+    `${ROOT_ROUTE_VIOLATIONS}/mode?filter=${filter}&value=${value}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token"),
+      },
+    }
+  );
 
   const resData = await response.json();
 
@@ -406,6 +432,7 @@ export async function getAllViolations(filter, value) {
         violationid: item.violationlistid,
         regnumber: item.vehicleregno,
         city: item.city,
+        status: item.isclose,
         violationname: item.violationdetails.name,
         violationdate: item.createdat,
         state: item.state,

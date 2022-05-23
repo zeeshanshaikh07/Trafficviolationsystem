@@ -10,7 +10,7 @@ type User struct {
 	Roleid    uint64 `gorm:"type:bigint(11)" json:"roleid"`
 	Loginid   string `gorm:"type:varchar(50)" json:"loginid"`
 	Fullname  string `gorm:"type:varchar(50)" json:"fullname"`
-	Createdby uint64 `gorm:"type:bigint(11)" json:"createdby"`
+	Createdby string `gorm:"type:varchar(50)" json:"createdby"`
 	DOB       string `gorm:"type:date" json:"DOB"`
 	Emailid   string `gorm:"uniqueIndex;type:varchar(30)" json:"emailid"`
 	Mobileno  string `gorm:"type:varchar(30)" json:"mobileno"`
@@ -35,6 +35,7 @@ type Uservehicles struct {
 	Loginid       string `gorm:"type:varchar(50)" json:"loginid"`
 	Regno         string `gorm:"type:varchar(30)" json:"regno"`
 	Chassisno     string `gorm:"type:varchar(30)" json:"chassisno"`
+	Vtoken        string `gorm:"-" json:"vtoken,omitempty"`
 }
 
 // -------------------------------------- DTOS --------------------------------------
@@ -48,7 +49,7 @@ type RegisterDTO struct {
 	Roleid    uint64 `json:"roleid,omitempty" form:"roleid"`
 	Loginid   string `json:"loginid" form:"loginid" binding:"required"`
 	Fullname  string `json:"fullname" form:"fullname" binding:"required"`
-	Createdby uint64 `json:"createdby" form:"createdby"`
+	Createdby string `json:"createdby" form:"createdby"`
 	DOB       string `json:"DOB" form:"DOB" binding:"required"`
 	Emailid   string `json:"emailid" form:"emailid" binding:"required"`
 	Mobileno  string `json:"mobileno" form:"mobileno" binding:"required"`

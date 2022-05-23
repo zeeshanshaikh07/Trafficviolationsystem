@@ -27,6 +27,7 @@ function createData(
   violationname,
   violationdate,
   charge,
+  status,
   city,
   state,
   details
@@ -37,6 +38,7 @@ function createData(
     violationname,
     violationdate,
     charge,
+    status,
     city,
     state,
     violationdetails: [details],
@@ -106,6 +108,7 @@ export default function Violation() {
           <TableCell>{row.violationname}</TableCell>
           <TableCell>{row.violationdate}</TableCell>
           <TableCell>Rs.{row.charge}</TableCell>
+          <TableCell>{row.status}</TableCell>
           <TableCell>{row.city}</TableCell>
           <TableCell>{row.state}</TableCell>
         </TableRow>
@@ -118,6 +121,7 @@ export default function Violation() {
               style={{
                 backgroundColor: "#313082",
                 color: "#FFFFFF",
+                width: "115%",
               }}
             >
               <Box sx={{ margin: 1 }}>
@@ -185,6 +189,13 @@ export default function Violation() {
   const rows = [];
 
   for (const key in violations) {
+    let status;
+    if (violations[key].status === 1) {
+      status = "Closed";
+    } else {
+      status = "Open";
+    }
+
     rows.push(
       createData(
         violations[key].violationid,
@@ -192,6 +203,7 @@ export default function Violation() {
         violations[key].violationname,
         FormatDate(violations[key].violationdate),
         violations[key].charge,
+        status,
         violations[key].city,
         violations[key].state,
         violations[key].violationdetails
@@ -274,6 +286,7 @@ export default function Violation() {
                 <TableCell>Violation Name</TableCell>
                 <TableCell>Violation Date</TableCell>
                 <TableCell>Violation Charge</TableCell>
+                <TableCell>Violation Status</TableCell>
                 <TableCell>City</TableCell>
                 <TableCell>State</TableCell>
               </TableRow>

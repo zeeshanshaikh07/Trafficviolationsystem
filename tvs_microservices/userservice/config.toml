@@ -1,10 +1,13 @@
 # filename: config.toml
 [database]
 host = "localhost"
-database = "tvs"
+database = "trafficviolationsystem"
 user = "root"
 password = ""
 secret = "trafficviolationsystemjwt"
 
 [server]
 port = ":8000"
+
+[servicecommunication]
+port="5000"
