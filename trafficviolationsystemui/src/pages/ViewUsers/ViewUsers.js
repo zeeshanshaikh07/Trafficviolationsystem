@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 
 const columns = [
   { id: "username", label: "Username", minWidth: 80 },
-  { id: "fulname", label: "Fullname", minWidth: 80 },
+  { id: "fulname", label: "Full Name", minWidth: 80 },
   {
     id: "emailid",
     label: "Email Id",
@@ -120,7 +120,7 @@ export default function ViewUsers() {
               textDecoration: "none",
               color: "white",
             }}
-            to={`/viewusers/${users[key].loginid}`}
+            to={`/viewusers/${users[key].loginid}/${users[key].roleid}`}
           >
             View
           </Link>
@@ -128,7 +128,7 @@ export default function ViewUsers() {
       )
     );
   }
-  const searchNSort = (
+  const sortUser = (
     <React.Fragment>
       <Autocomplete
         value={value}
@@ -181,7 +181,7 @@ export default function ViewUsers() {
         }}
       >
         <Card>
-          {localStorage.getItem("roleid") === "1" && searchNSort}
+          {localStorage.getItem("roleid") === "1" && sortUser}
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader aria-label="sticky table">
@@ -191,7 +191,7 @@ export default function ViewUsers() {
                       <TableCell
                         key={column.id}
                         align={column.align}
-                        style={{ minWidth: column.minWidth }}
+                        style={{ minWidth: column.minWidth, fontWeight: "800" }}
                       >
                         {column.label}
                       </TableCell>

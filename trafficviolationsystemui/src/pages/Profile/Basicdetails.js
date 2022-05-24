@@ -81,6 +81,7 @@ export default function BasicDetails(props) {
     const name = event.target.name;
     const value = event.target.value;
     setUserdata({
+      ...userdata,
       [name]: value,
     });
   };

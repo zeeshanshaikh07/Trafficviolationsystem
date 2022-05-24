@@ -3,15 +3,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { confirmAlert } from "react-confirm-alert";
+import { deleteVehicle } from "../../libs/api";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { deleteVehicle, updateVehicle } from "../../libs/api";
-import useInput from "../../hooks/use-input";
 import Card from "../../layouts/Card/Card";
-import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-
 import Alert from "@mui/material/Alert";
 
 const theme = createTheme();
@@ -20,18 +17,6 @@ export default function SingleVehicle(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-
-  const {
-    hasError: vehicleregnoError,
-    inputChangeHander: vehicleregnoInputChangeHander,
-    inputBlurHandler: vehicleregnoInputBlurHandler,
-  } = useInput((value) => value.trim() !== "");
-
-  const {
-    hasError: vehiclechassisnoError,
-    inputChangeHander: vehiclechassisnoInputChangeHander,
-    inputBlurHandler: vehiclechassisnoInputBlurHandler,
-  } = useInput((value) => value.trim() !== "");
 
   const deleteUserVehicle = (event) => {
     confirmAlert({
@@ -69,41 +54,6 @@ export default function SingleVehicle(props) {
     });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const data = new FormData(event.currentTarget);
-
-    if (
-      data.get("vehicleregno").length === 0 ||
-      data.get("vehiclechassisno").length === 0
-    ) {
-      return;
-    }
-
-    const vehicleData = {
-      regno: data.get("vehicleregno"),
-      chassisno: data.get("vehiclechassisno"),
-    };
-
-    await updateVehicle(vehicleData, data.get("regno"))
-      .then((res) => {
-        if (res.status_code === 200) {
-          setIsLoading(false);
-          setSuccess(res.message);
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        } else {
-          setIsLoading(false);
-          setError(res.message);
-        }
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
-  };
-
   return (
     <Fragment>
       <ThemeProvider theme={theme}>
@@ -116,62 +66,15 @@ export default function SingleVehicle(props) {
           {!isLoading && success !== "" && (
             <Alert severity="success">{success}</Alert>
           )}
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ flexGrow: 1 }}
-          >
+          <Box component="form" noValidate sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <TextField
-                  defaultValue={props.regno}
-                  onChange={vehicleregnoInputChangeHander}
-                  onBlur={vehicleregnoInputBlurHandler}
-                  error={vehicleregnoError}
-                  helperText={
-                    vehicleregnoError
-                      ? "Please add new vehicle registration number!"
-                      : " "
-                  }
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="vehicleregno"
-                  label="Vehicle registration number"
-                  name="vehicleregno"
-                  autoComplete="vehicleregno"
-                />
+                <h3>Registration Number : {props.regno}</h3>
               </Grid>
               <Grid item xs={4}>
-                <TextField
-                  defaultValue={props.chassisno}
-                  onChange={vehiclechassisnoInputChangeHander}
-                  onBlur={vehiclechassisnoInputBlurHandler}
-                  error={vehiclechassisnoError}
-                  helperText={
-                    vehiclechassisnoError
-                      ? "Please add new chassis number!"
-                      : " "
-                  }
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="vehiclechassisno"
-                  label="Vehicle chassic number"
-                  name="vehiclechassisno"
-                  autoComplete="vehiclechassisno"
-                />
-                <TextField
-                  id="regno"
-                  name="regno"
-                  defaultValue={props.regno}
-                  style={{
-                    display: "none",
-                  }}
-                />
+                <h3>Chassis Number : {props.chassisno}</h3>
               </Grid>
-              <Grid item xs={4} sx={{ mt: 3 }}>
+              <Grid item xs={4} sx={{ mt: 1.3 }}>
                 <Grid container>
                   <Grid item xs={4}>
                     <Button
@@ -190,29 +93,13 @@ export default function SingleVehicle(props) {
                           textDecoration: "none",
                           color: "white",
                         }}
-                        to={`/vehicles/${props.regno}`}
+                        to={`/vehicles/${props.regno}/${props.chassisno}`}
                       >
                         View
                       </Link>
                     </Button>
                   </Grid>
-                  <Grid item xs={4}>
-                    <Button
-                      type="submit"
-                      style={{
-                        backgroundColor: "#4CD137",
-                        float: "right",
-                        border: "none",
-                        color: "white",
-                        borderRadius: "20px",
-                        padding: "10px 20px",
-                      }}
-                      variant="contained"
-                      onSubmit={handleSubmit}
-                    >
-                      Update
-                    </Button>
-                  </Grid>
+                  <Grid item xs={1}></Grid>
                   <Grid item xs={4}>
                     <Button
                       onClick={deleteUserVehicle}

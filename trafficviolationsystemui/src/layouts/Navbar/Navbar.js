@@ -31,10 +31,7 @@ export default function ButtonAppBar() {
         {
           label: "Yes",
           onClick: async () => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("roleid");
-            localStorage.removeItem("loginid");
-            localStorage.removeItem("isLoggedIn");
+            localStorage.clear();
             navigate("");
           },
         },
@@ -175,50 +172,6 @@ export default function ButtonAppBar() {
               </Button>
             </Fragment>
           )}
-
-          {/* {roleid === "1" && !isNull && (
-            <Fragment>
-              <NavLink
-                to="/allviolations"
-                className={({ isActive }) =>
-                  isActive ? classes.activeClass : classes.notActiveClass
-                }
-              >
-                Violations
-              </NavLink>
-
-              <NavLink
-                to={"/viewusers"}
-                className={({ isActive }) =>
-                  isActive ? classes.activeClass : classes.notActiveClass
-                }
-              >
-                Users
-              </NavLink>
-              <NavLink
-                to={"/profile"}
-                className={({ isActive }) =>
-                  isActive ? classes.activeClass : classes.notActiveClass
-                }
-              >
-                Profile
-              </NavLink>
-              <Button
-                sx={{ ml: 2 }}
-                style={{
-                  backgroundColor: "#313082",
-                  float: "right",
-                  border: "none",
-                  color: "white",
-                  textTransform: "none",
-                }}
-                variant="contained"
-                onClick={logOutHandler}
-              >
-                Sign Out
-              </Button>
-            </Fragment>
-          )} */}
         </Toolbar>
       </AppBar>
     </Box>

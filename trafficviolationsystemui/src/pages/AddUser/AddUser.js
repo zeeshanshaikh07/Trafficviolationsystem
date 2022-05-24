@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
-import { register } from "../../libs/api";
+import { addUser } from "../../libs/api";
 import { useNavigate } from "react-router-dom";
 
 import { Fragment } from "react";
@@ -119,7 +119,7 @@ export default function AddUser() {
       password: data.get("password"),
     };
 
-    await register(userData)
+    await addUser(userData)
       .then((res) => {
         window.scrollTo(0, 0);
         if (res.status_code === 201) {

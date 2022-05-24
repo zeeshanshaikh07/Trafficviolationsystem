@@ -16,8 +16,7 @@ import (
 
 func HandleViolationRequests(r *gin.Engine, db *gorm.DB) {
 	var (
-		jwtService utils.JWT = utils.NewJWTService()
-
+		jwtService          utils.JWT                      = utils.NewJWTService()
 		violationRepository model.ViolationRepository      = repository.NewViolationRepository(db)
 		violationService    model.ViolationService         = service.NewViolationService(violationRepository)
 		violationController controller.ViolationController = controller.NewViolationController(violationService, jwtService)

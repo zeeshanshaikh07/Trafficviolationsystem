@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Fragment } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import SignIn from "./pages/SignIn/SignIn";
@@ -18,10 +19,25 @@ import ViewSingleUser from "./pages/ViewUsers/ViewSingleUser";
 import ViewPayments from "./pages/ViewPayments/ViewPayments";
 import AddUser from "./pages/AddUser/AddUser";
 import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
+import jwt_decode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 function Router() {
-  const isAuthenticated = !!localStorage.getItem("token");
+  let token = localStorage.getItem("token");
+  const isAuthenticated = !!token;
   const role = localStorage.getItem("roleid");
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (token) {
+      var decoded = jwt_decode(token);
+      const expirationTime = decoded.exp * 1000 - 60000;
+      if (Date.now() >= expirationTime) {
+        navigate("/");
+        localStorage.clear();
+      }
+    }
+  }, [token, navigate]);
 
   return (
     <Fragment>
@@ -37,7 +53,7 @@ function Router() {
           }
         />
         <Route
-          path="/vehicles/:vehicleregno"
+          path="/vehicles/:vehicleregno/:chassisno"
           element={isAuthenticated ? <VehicleSummary /> : <Navigate to="/" />}
         />
         <Route
@@ -90,7 +106,7 @@ function Router() {
           element={isAuthenticated ? <ViewUsers /> : <Navigate to="/" />}
         />
         <Route
-          path="/viewusers/:loginid"
+          path="/viewusers/:loginid/:roleid"
           element={isAuthenticated ? <ViewSingleUser /> : <Navigate to="/" />}
         />
         <Route

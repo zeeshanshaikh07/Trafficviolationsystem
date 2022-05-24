@@ -1,13 +1,13 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/KadirSheikh/tvs_utils/middleware"
+	"github.com/KadirSheikh/tvs_utils/utils"
 	"github.com/gin-gonic/gin"
 	"trafficsystem.com/vehicleregistrationservice/model"
-	"trafficsystem.com/vehicleregistrationservice/utils"
 )
 
 type sRegistrationcontroller struct {
@@ -18,6 +18,26 @@ func NewRegistrationController(s model.RegistrationService) *sRegistrationcontro
 	return &sRegistrationcontroller{srv: s}
 }
 
+func AuthorizeRequest(c *gin.Context, srv model.RegistrationService) bool {
+
+	payload := c.MustGet(middleware.AuthorizationPayloadKey).(*utils.Payload)
+
+	status, err := srv.VerifyVehicle(payload.ChasisNumber, payload.Vehicleregno)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"Error": err})
+		return status
+	}
+
+	if !status {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"Error": "Invalid vehicle",
+		})
+		return status
+	}
+
+	return status
+}
+
 func (ctrl sRegistrationcontroller) VehicleSummary(c *gin.Context) {
 	vno := c.Param("vno")
 	obj, err := ctrl.srv.GetVehicleSummary(vno)
@@ -26,7 +46,6 @@ func (ctrl sRegistrationcontroller) VehicleSummary(c *gin.Context) {
 			"Server error": err})
 	}
 
-	fmt.Println("Object ", obj)
 	c.JSON(http.StatusOK, gin.H{"Summary": obj})
 }
 
@@ -35,7 +54,7 @@ func (ctrl sRegistrationcontroller) VehicleRegistration(c *gin.Context) {
 	isConsolidated, _ = strconv.Atoi(c.DefaultQuery("isconsolidated", "0"))
 	vno := c.Query("vehicleregno")
 
-	if !utils.Authoizerequest(c, ctrl.srv) {
+	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"Error": "Authorization failed!",
 		})
@@ -43,7 +62,6 @@ func (ctrl sRegistrationcontroller) VehicleRegistration(c *gin.Context) {
 	}
 
 	if isConsolidated == 1 {
-		fmt.Println("inside vehicle summary", vno)
 		obj, err := ctrl.srv.GetVehicleSummary(vno)
 
 		if err != nil {
@@ -68,7 +86,7 @@ func (ctrl sRegistrationcontroller) VehicleRegistration(c *gin.Context) {
 
 func (ctrl sRegistrationcontroller) VehicleInsurance(c *gin.Context) {
 
-	if !utils.Authoizerequest(c, ctrl.srv) {
+	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"Error": "Authorization failed!",
 		})
@@ -85,7 +103,7 @@ func (ctrl sRegistrationcontroller) VehicleInsurance(c *gin.Context) {
 }
 
 func (ctrl sRegistrationcontroller) VehiclePuc(c *gin.Context) {
-	if !utils.Authoizerequest(c, ctrl.srv) {
+	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"Error": "Authorization failed!",
 		})
@@ -102,7 +120,7 @@ func (ctrl sRegistrationcontroller) VehiclePuc(c *gin.Context) {
 }
 
 func (ctrl sRegistrationcontroller) VehicleInfo(c *gin.Context) {
-	if !utils.Authoizerequest(c, ctrl.srv) {
+	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"Error": "Authorization failed!",
 		})

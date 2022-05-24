@@ -40,6 +40,7 @@ func HandleRequests(r *gin.Engine, db *gorm.DB) {
 		routes.PUT("/address/:addressid", userController.UpdateUserAddress)
 
 		routes.GET("/:roleid", middleware.AuthorizeJWT(jwt), userController.GetAllUsers)
+		routes.GET("/getvtoken", middleware.AuthorizeJWT(jwt), userController.GetVToken)
 
 	}
 }

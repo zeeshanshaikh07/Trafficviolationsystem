@@ -129,7 +129,7 @@ export default function ViewPayments() {
                     <TableCell
                       key={column.id}
                       align={column.align}
-                      style={{ minWidth: column.minWidth }}
+                      style={{ minWidth: column.minWidth, fontWeight: "800" }}
                     >
                       {column.label}
                     </TableCell>

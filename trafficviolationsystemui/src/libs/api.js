@@ -1,7 +1,7 @@
-const ROOT_ROUTE_USERS = "http://localhost:8000/api/v1/users";
 const ROOT_ROUTE_VEHICLES = "http://localhost:9001/api/v1/vehicle";
 const ROOT_ROUTE_VIOLATIONS = "http://localhost:9002/api/v1/violation";
 const ROOT_ROUTE_PAYMENTS = "http://localhost:9003/api/v1/payments";
+const ROOT_ROUTE_USERS = "http://localhost:9004/api/v1/users";
 
 const setItem = (token, roleid, loginid) => {
   localStorage.setItem("token", token);
@@ -42,6 +42,19 @@ export async function register(userData) {
   return resData;
 }
 
+export async function addUser(userData) {
+  const response = await fetch(`${ROOT_ROUTE_USERS}/`, {
+    method: "POST",
+    body: JSON.stringify(userData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const resData = await response.json();
+
+  return resData;
+}
+
 export async function addVehicle(vehicleData) {
   const response = await fetch(`${ROOT_ROUTE_USERS}/vehicles`, {
     method: "POST",
@@ -52,9 +65,6 @@ export async function addVehicle(vehicleData) {
     },
   });
   const resData = await response.json();
-  if (resData.status_code === 201 || resData.status_code === 200) {
-    localStorage.setItem("vtoken", resData.data.vtoken);
-  }
 
   return resData;
 }
@@ -125,20 +135,33 @@ export async function deleteVehicle(vehicleid) {
   return resData;
 }
 
-export async function getVehicleSummary(vehicleregno) {
+export async function getVehicleSummary(vehicleregno, chassisno) {
   const response = await fetch(
-    `${ROOT_ROUTE_VEHICLES}/registration?vehicleregno=${vehicleregno}`,
+    `${ROOT_ROUTE_USERS}/getvtoken?vehregno=${vehicleregno}&chassisno=${chassisno}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("vtoken"),
+        Authorization: localStorage.getItem("token"),
       },
     }
   );
 
-  console.log(response);
-  return response;
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    const resp = await fetch(
+      `${ROOT_ROUTE_VEHICLES}/registration?vehicleregno=${vehicleregno}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: resData.data,
+        },
+      }
+    );
+    return resp;
+  }
 }
 
 export async function getViolations(type) {
@@ -427,7 +450,7 @@ export async function getAllViolations(filter, value) {
   const resData = await response.json();
 
   if (resData.status_code === 200) {
-    resData.data.map((item) => {
+    resData.data.map((item) =>
       loadedViolations.push({
         violationid: item.violationlistid,
         regnumber: item.vehicleregno,
@@ -444,8 +467,8 @@ export async function getAllViolations(filter, value) {
           device: item.devicetype,
           description: item.violationdetails.description,
         },
-      });
-    });
+      })
+    );
   }
 
   return loadedViolations;

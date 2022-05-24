@@ -57,7 +57,7 @@ export default function ViewUserVehicle(props) {
   return (
     <Fragment>
       <ThemeProvider theme={theme}>
-        <Topbar>User Vehicles</Topbar>
+        <Topbar>{loginid} Vehicles</Topbar>
 
         {error && (
           <section
@@ -110,7 +110,7 @@ export default function ViewUserVehicle(props) {
                           textDecoration: "none",
                           color: "white",
                         }}
-                        to={`/vehicles/${vehicle.regno}`}
+                        to={`/vehicles/${vehicle.regno}/${vehicle.chassisno}`}
                       >
                         View details
                       </Link>
