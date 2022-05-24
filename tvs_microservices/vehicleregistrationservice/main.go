@@ -3,33 +3,24 @@ package main
 import (
 	"fmt"
 
+	"github.com/KadirSheikh/tvs_utils/middleware"
+	"github.com/KadirSheikh/tvs_utils/utils"
 	db "trafficsystem.com/vehicleregistrationservice/config"
-	"trafficsystem.com/vehicleregistrationservice/middleware"
 	"trafficsystem.com/vehicleregistrationservice/routes"
-	"trafficsystem.com/vehicleregistrationservice/service"
-	"trafficsystem.com/vehicleregistrationservice/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 func initializeComponents(r *gin.Engine, conf *utils.Config) {
-	//Get db object
 	gormCon := db.InitializeDbConnection(conf)
-
-	r.Use(middleware.AuthMiddleware(service.NewJWTService(conf.AuthInfo.Secrekey)))
-
+	r.Use(middleware.AuthMiddleware(utils.NewJWTService()))
 	routes.HandleRegistrationRequests(r, gormCon)
 }
 
 func initializeConfigsAndRoutes(r *gin.Engine) {
-	conf := utils.NewConfig() //Initialize config
-
+	conf := utils.NewConfig()
 	initializeComponents(r, conf)
-
-	fmt.Println("Vehicle registration service is running on port ", conf.Srv.Port)
-
-	port := fmt.Sprintf(":%s", conf.Srv.Port)
-	fmt.Println("server port ", port)
+	port := fmt.Sprintf(":%s", conf.Server.Port)
 	r.Run(port)
 }
 

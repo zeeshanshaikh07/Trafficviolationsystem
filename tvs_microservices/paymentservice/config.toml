@@ -9,5 +9,3 @@ secret = "trafficviolationsystemjwt"
 [server]
 port =":9003"
 
-[servicecommunication]
-port="5000"

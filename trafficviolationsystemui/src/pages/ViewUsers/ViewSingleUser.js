@@ -1,19 +1,19 @@
 import * as React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import { Fragment } from "react";
+import { CssBaseline } from "@mui/material";
+import { getUserBasicDetails } from "../../libs/api";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { getUserAddress } from "../../libs/api";
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import classes from "../../assets/Styling/Auth.module.css";
-import { CssBaseline } from "@mui/material";
 import Card from "../../layouts/Card/Card";
-import { getUserBasicDetails } from "../../libs/api";
-import { useParams } from "react-router-dom";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
-import { getUserAddress } from "../../libs/api";
-import Address from "../Profile/Address";
+import FormatDate from "../../utils/FormatDate";
 
 const theme = createTheme();
 
@@ -24,7 +24,7 @@ export default function ViewSingleUser(props) {
   const [userdata, setUserdata] = React.useState([]);
 
   const params = useParams();
-  const { loginid } = params;
+  const { loginid, roleid } = params;
 
   const [addressdata, setAddressdata] = React.useState([]);
 
@@ -44,8 +44,6 @@ export default function ViewSingleUser(props) {
       setError(err.message);
     });
   }, [loginid]);
-
-  console.log(addressdata);
 
   React.useEffect(() => {
     async function fetchVehicleData() {
@@ -82,52 +80,57 @@ export default function ViewSingleUser(props) {
     <Fragment>
       <ThemeProvider theme={theme}>
         <Topbar>{userdata.loginid}</Topbar>
-        <Button
-          style={{
-            backgroundColor: "#313082",
-            float: "right",
-            border: "none",
-            color: "white",
-            borderRadius: "20px",
-            padding: "10px 30px",
-            marginRight: "30px",
-            marginTop: "30px",
-          }}
-          variant="contained"
-        >
-          <Link
-            style={{
-              textDecoration: "none",
-              color: "white",
-            }}
-            to={`/viewuservehicle/${loginid}`}
-          >
-            View Vehicles
-          </Link>
-        </Button>
-        <Button
-          style={{
-            backgroundColor: "#313082",
-            float: "right",
-            border: "none",
-            color: "white",
-            borderRadius: "20px",
-            padding: "10px 30px",
-            marginRight: "30px",
-            marginTop: "30px",
-          }}
-          variant="contained"
-        >
-          <Link
-            style={{
-              textDecoration: "none",
-              color: "white",
-            }}
-            to={`/viewpayments/${loginid}`}
-          >
-            View Payments
-          </Link>
-        </Button>
+        {roleid === "3" && (
+          <Fragment>
+            <Button
+              style={{
+                backgroundColor: "#313082",
+                float: "right",
+                border: "none",
+                color: "white",
+                borderRadius: "20px",
+                padding: "10px 30px",
+                marginRight: "30px",
+                marginTop: "30px",
+              }}
+              variant="contained"
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "white",
+                }}
+                to={`/viewuservehicle/${loginid}`}
+              >
+                View Vehicles
+              </Link>
+            </Button>
+            <Button
+              style={{
+                backgroundColor: "#313082",
+                float: "right",
+                border: "none",
+                color: "white",
+                borderRadius: "20px",
+                padding: "10px 30px",
+                marginRight: "30px",
+                marginTop: "30px",
+              }}
+              variant="contained"
+            >
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "white",
+                }}
+                to={`/viewpayments/${loginid}`}
+              >
+                View Payments
+              </Link>
+            </Button>
+          </Fragment>
+        )}
+
         <div
           style={{
             marginTop: "100px",
@@ -188,7 +191,7 @@ export default function ViewSingleUser(props) {
                     </Grid>
                     <Grid container spacing={2}>
                       <Grid item xs={4}>
-                        <h4>DOB : {userdata.DOB}</h4>
+                        <h4>DOB : {FormatDate(userdata.DOB)}</h4>
                       </Grid>
                       <Grid item xs={4}>
                         <h4>Mobile Number : {userdata.mobileno}</h4>

@@ -7,6 +7,8 @@ import (
 
 	"trafficviolationsystem/userservice/model"
 
+	"github.com/KadirSheikh/tvs_utils/middleware"
+
 	"github.com/KadirSheikh/tvs_utils/utils"
 
 	"github.com/dgrijalva/jwt-go"
@@ -118,15 +120,9 @@ func (c *userController) AddVehicle(context *gin.Context) {
 			userVehicleDTO.Userid = userid
 		}
 
-		loginid := fmt.Sprintf("%v", claims["loginid"])
-		if loginid == "" {
-			res := utils.NotFound(0)
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
-		}
-		if err == nil {
-			userVehicleDTO.Loginid = loginid
-		}
+		loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
+
+		userVehicleDTO.Loginid = loginid
 
 		vToken := c.jwt.GenerateServiceValidationToken(userVehicleDTO.Chassisno, userVehicleDTO.Regno)
 		resp, err := client.R().
@@ -164,21 +160,8 @@ func (c *userController) AddVehicle(context *gin.Context) {
 }
 
 func (c *userController) AllVehicles(context *gin.Context) {
-	authHeader := context.GetHeader("Authorization")
-	token, errToken := c.jwt.ValidateToken(authHeader)
-	if errToken != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	loginid := fmt.Sprintf("%v", claims["loginid"])
-	if loginid == "" {
-		res := utils.NotFound(0)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
-	}
 
+	loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
 	loginidParam := context.Query("loginid")
 	if loginidParam == "" {
 		uservehicles, err := c.userService.GetAllUserVehicles(loginid)
@@ -215,15 +198,7 @@ func (c *userController) DeleteVehicle(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, response)
 	}
 	vehicle.Regno = regno
-	authHeader := context.GetHeader("Authorization")
-	token, errToken := c.jwt.ValidateToken(authHeader)
-	if errToken != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
+	userid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Userid)), 10, 64)
 	if err != nil {
 		res := utils.NotFound(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
@@ -258,20 +233,7 @@ func (c *userController) DeleteVehicle(context *gin.Context) {
 }
 
 func (c *userController) UserDetails(context *gin.Context) {
-	authHeader := context.GetHeader("Authorization")
-	token, errToken := c.jwt.ValidateToken(authHeader)
-	if errToken != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	loginid := fmt.Sprintf("%v", claims["loginid"])
-	if loginid == "" {
-		res := utils.NotFound(0)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
-	}
+	loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
 
 	loginidParam := context.Query("loginid")
 	if loginidParam == "" {
@@ -300,6 +262,27 @@ func (c *userController) UserDetails(context *gin.Context) {
 
 }
 
+func (c *userController) GetVToken(context *gin.Context) {
+	vehregno := context.Query("vehregno")
+	if vehregno == "" {
+		res := utils.BadRequest()
+		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+		context.JSON(http.StatusBadRequest, response)
+	}
+
+	chassisno := context.Query("chassisno")
+	if chassisno == "" {
+		res := utils.BadRequest()
+		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+		context.JSON(http.StatusBadRequest, response)
+	}
+
+	vToken := c.jwt.GenerateServiceValidationToken(chassisno, vehregno)
+	res := utils.OK(8)
+	response := utils.BuildResponse(res.Message, res.Code, vToken)
+	context.JSON(http.StatusCreated, response)
+}
+
 func (c *userController) AddAddress(context *gin.Context) {
 	var addressdto model.Useraddressdto
 	errDTO := context.ShouldBindJSON(&addressdto)
@@ -308,20 +291,7 @@ func (c *userController) AddAddress(context *gin.Context) {
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
 	} else {
-		authHeader := context.GetHeader("Authorization")
-		token, errToken := c.jwt.ValidateToken(authHeader)
-		if errToken != nil {
-			res := utils.BadRequest()
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
-		}
-		claims := token.Claims.(jwt.MapClaims)
-		loginid := fmt.Sprintf("%v", claims["loginid"])
-		if loginid == "" {
-			res := utils.NotFound(0)
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
-		}
+		loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
 
 		addressdto.Loginid = loginid
 
@@ -340,20 +310,7 @@ func (c *userController) AddAddress(context *gin.Context) {
 }
 
 func (c *userController) GetAddress(context *gin.Context) {
-	authHeader := context.GetHeader("Authorization")
-	token, errToken := c.jwt.ValidateToken(authHeader)
-	if errToken != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	loginid := fmt.Sprintf("%v", claims["loginid"])
-	if loginid == "" {
-		res := utils.NotFound(0)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
+	loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
 
 	loginidParam := context.Query("loginid")
 	if loginidParam == "" {
@@ -426,6 +383,7 @@ func (c *userController) ResetPassword(context *gin.Context) {
 	}
 
 }
+
 func (c *userController) UpdateVehicle(context *gin.Context) {
 	var vehicleUpdateDTO model.UservehiclesupdateDTO
 	vehicleregno := context.Param("vehicleregno")
@@ -435,15 +393,7 @@ func (c *userController) UpdateVehicle(context *gin.Context) {
 		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
-	authHeader := context.GetHeader("Authorization")
-	token, errToken := c.jwt.ValidateToken(authHeader)
-	if errToken != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
+	userid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Userid)), 10, 64)
 	if err != nil {
 		res := utils.NotFound(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
@@ -488,31 +438,17 @@ func (c *userController) UpdateVehicle(context *gin.Context) {
 
 func (c *userController) UpdateUserDetails(context *gin.Context) {
 	var userUpdatedto model.UpdateuserDTO
-	authHeader := context.GetHeader("Authorization")
-	token, errToken := c.jwt.ValidateToken(authHeader)
-	if errToken != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	claims := token.Claims.(jwt.MapClaims)
-	loginid := fmt.Sprintf("%v", claims["loginid"])
-	if loginid == "" {
+	loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
+
+	userid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Userid)), 10, 64)
+	if err != nil {
 		res := utils.NotFound(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusBadRequest, response)
 	}
-
-	userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
-	if err != nil {
-		res := utils.NotFound(7)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-
 	userUpdatedto.Userid = userid
 
-	roleid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["roleid"]), 10, 64)
+	roleid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Roleid)), 10, 64)
 	if err != nil {
 		res := utils.NotFound(6)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})

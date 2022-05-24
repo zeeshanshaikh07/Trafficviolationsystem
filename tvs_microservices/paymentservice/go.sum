@@ -8,6 +8,8 @@ github.com/KadirSheikh/tvs_utils v1.2.0 h1:/7LlGwmTI1LHN5unsTRZ+dLI9LXqIEYyV4mK6
 github.com/KadirSheikh/tvs_utils v1.2.0/go.mod h1:ttjB5AtXnK5dv8tnoUKifLnwWcMsPLOqyJwoMv5bpU4=
 github.com/KadirSheikh/tvs_utils v1.5.0 h1:sBKn7Qbq9g1cXQunCyA6gOi6hX2fYpX8VbQvZxSWcYA=
 github.com/KadirSheikh/tvs_utils v1.5.0/go.mod h1:i8HEuNTvkEEbGKcP5Emg30U1Sp0yNaLaLAMI6/hVbx0=
+github.com/KadirSheikh/tvs_utils v1.7.0 h1:EdhpSR8gnk/7Zn/Te1yYMkkHxBLPT6+u9jQn7+GGPYg=
+github.com/KadirSheikh/tvs_utils v1.7.0/go.mod h1:i8HEuNTvkEEbGKcP5Emg30U1Sp0yNaLaLAMI6/hVbx0=
 github.com/Kshitija2022/tvs_utils v1.0.0 h1:dzOFuHJeJ1s5zI12dvw/s/cVUwW5DdXVHk1zD9V8JE4=
 github.com/Kshitija2022/tvs_utils v1.0.0/go.mod h1:BpagdzdrN7Il/kjkklqDBo+cGdprqOyDbAYarEe2UiM=
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=

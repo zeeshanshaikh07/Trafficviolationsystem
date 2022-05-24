@@ -6,6 +6,8 @@ github.com/KadirSheikh/tvs_utils v1.1.0 h1:671dWatIzdbNjYz3mpXppsqPKQAzauvXnKOte
 github.com/KadirSheikh/tvs_utils v1.1.0/go.mod h1:ttjB5AtXnK5dv8tnoUKifLnwWcMsPLOqyJwoMv5bpU4=
 github.com/KadirSheikh/tvs_utils v1.5.0 h1:sBKn7Qbq9g1cXQunCyA6gOi6hX2fYpX8VbQvZxSWcYA=
 github.com/KadirSheikh/tvs_utils v1.5.0/go.mod h1:i8HEuNTvkEEbGKcP5Emg30U1Sp0yNaLaLAMI6/hVbx0=
+github.com/KadirSheikh/tvs_utils v1.7.0 h1:EdhpSR8gnk/7Zn/Te1yYMkkHxBLPT6+u9jQn7+GGPYg=
+github.com/KadirSheikh/tvs_utils v1.7.0/go.mod h1:i8HEuNTvkEEbGKcP5Emg30U1Sp0yNaLaLAMI6/hVbx0=
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useEffect } from "react";
 import { getAllViolations } from "../../libs/api";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Box from "@mui/material/Box";
@@ -282,13 +281,55 @@ export default function Violation() {
           <Table aria-label="collapsible table">
             <TableHead>
               <TableRow>
-                <TableCell>Vehicle Reg No.</TableCell>
-                <TableCell>Violation Name</TableCell>
-                <TableCell>Violation Date</TableCell>
-                <TableCell>Violation Charge</TableCell>
-                <TableCell>Violation Status</TableCell>
-                <TableCell>City</TableCell>
-                <TableCell>State</TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Vehicle Reg No.
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Name
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Date
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Charge
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Status
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  City
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  State
+                </TableCell>
               </TableRow>
             </TableHead>
             {!error && !isViolationEmpty && !isLoading && (

@@ -18,6 +18,9 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Modal from "../../layouts/Modal/Modal";
 import FormatDate from "../../utils/FormatDate";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import IconButton from "@mui/material/IconButton";
 
 function createData(
   violationid,
@@ -104,6 +107,15 @@ export default function Violation() {
             cursor: "pointer",
           }}
         >
+          <TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
           <TableCell>{row.regnumber}</TableCell>
           <TableCell>{row.violationname}</TableCell>
           <TableCell>{row.violationdate}</TableCell>
@@ -120,6 +132,7 @@ export default function Violation() {
               style={{
                 backgroundColor: "#313082",
                 color: "#FFFFFF",
+                width: "113%",
               }}
             >
               <Box sx={{ margin: 1 }}>
@@ -285,12 +298,49 @@ export default function Violation() {
           <Table aria-label="collapsible table">
             <TableHead>
               <TableRow>
-                <TableCell>Vehicle Reg No.</TableCell>
-                <TableCell>Violation Name</TableCell>
-                <TableCell>Violation Date</TableCell>
-                <TableCell>Violation Charge</TableCell>
-                <TableCell>City</TableCell>
-                <TableCell>State</TableCell>
+                <TableCell></TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Vehicle Reg No.
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Name
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Date
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  Violation Charge
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  City
+                </TableCell>
+                <TableCell
+                  style={{
+                    fontWeight: "800",
+                  }}
+                >
+                  State
+                </TableCell>
               </TableRow>
             </TableHead>
             {!error && !isViolationEmpty && !isLoading && (

@@ -16,11 +16,11 @@ export default function VehicleSummary() {
   const [insurance, setInsurance] = useState({});
 
   const params = useParams();
-  const { vehicleregno } = params;
+  const { vehicleregno, chassisno } = params;
 
   useEffect(() => {
     async function fetchVehicleData() {
-      await getVehicleSummary(vehicleregno).then(async (data) => {
+      await getVehicleSummary(vehicleregno, chassisno).then(async (data) => {
         if (data.ok && data.status === 200) {
           const resData = await data.json();
 
@@ -40,7 +40,7 @@ export default function VehicleSummary() {
       setIsLoading(false);
       setError(err.message);
     });
-  }, [vehicleregno]);
+  }, [vehicleregno, chassisno]);
 
   if (isLoading) {
     return (

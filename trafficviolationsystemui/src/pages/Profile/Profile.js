@@ -29,7 +29,7 @@ export default function Profile() {
     <Fragment>
       <ThemeProvider theme={theme}>
         <Topbar>User Profile</Topbar>
-        {localStorage.getItem("roleid") === 3 && (
+        {localStorage.getItem("roleid") === "3" && (
           <Button
             style={{
               backgroundColor: "#313082",

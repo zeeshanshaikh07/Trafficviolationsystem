@@ -10,8 +10,6 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -67,7 +65,6 @@ export default function SignIn() {
     await login(userData)
       .then((res) => {
         if (res.status_code === 200) {
-          console.log(res);
           setIsLoading(false);
           setSuccess(res.message);
           if (res.data.roleid === 2 || res.data.roleid === 1) {
