@@ -34,7 +34,8 @@ func (c *violationController) GetAllViolations(context *gin.Context) {
 	if vno == "" {
 		data := utils.NotFound(0)
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 
 	authHeader := context.GetHeader("Authorization")
@@ -43,7 +44,8 @@ func (c *violationController) GetAllViolations(context *gin.Context) {
 	if errToken != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
 	}
 	isclose := context.Query("isclose")
 
@@ -51,7 +53,8 @@ func (c *violationController) GetAllViolations(context *gin.Context) {
 	if err != nil {
 		data := utils.ViolationFound(0)
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
 		data := utils.OK(1)
 		res := utils.BuildResponse(data.Message, data.Code, violationlist)
@@ -68,7 +71,8 @@ func (c *violationController) GetViolations(context *gin.Context) {
 	if err != nil {
 		data := utils.ViolationFound(0)
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
 		data := utils.OK(1)
 		res := utils.BuildResponse(data.Message, data.Code, violationlist)
@@ -82,21 +86,22 @@ func (c *violationController) CloseViolation(context *gin.Context) {
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 	id, err := strconv.ParseUint(context.Param("tvsid"), 0, 0)
 	if err != nil {
 		data := utils.NotFound(0)
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
 		return
 	}
 	violationclose, err := c.violationService.CloseViolation(violationclosedto, id)
 	if err != nil {
 		res := utils.ViolationFound(1)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusNotFound, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
 		res := utils.OK(1)
 		response := utils.BuildResponse(res.Message, res.Code, violationclose)

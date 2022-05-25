@@ -68,6 +68,7 @@ export default function ViewUsers() {
   const [isUserEmpty, setIsUserEmpty] = React.useState(false);
   const [value, setValue] = React.useState(options[0]);
   const [inputValue, setInputValue] = React.useState("");
+  const [searchValue, setSearchValue] = React.useState("");
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -97,37 +98,37 @@ export default function ViewUsers() {
     });
   }, [value]);
 
+  const searchValueHandler = (event) => {
+    setSearchValue(event.target.value);
+  };
+
   const rows = [];
 
-  for (const key in users) {
-    let role;
-    if (users[key].roleid === 3) {
-      role = "User";
-    } else {
-      role = "Admin";
-    }
-    rows.push(
-      createData(
-        users[key].loginid,
-        users[key].fullname,
-        users[key].emailid,
-        users[key].mobileno,
-        role,
-        users[key].createdby,
-        <Button variant="contained">
-          <Link
-            style={{
-              textDecoration: "none",
-              color: "white",
-            }}
-            to={`/viewusers/${users[key].loginid}/${users[key].roleid}`}
-          >
-            View
-          </Link>
-        </Button>
+  users
+    .filter((user) => user.loginid.match(new RegExp(searchValue, "i")))
+    .map((user) =>
+      rows.push(
+        createData(
+          user.loginid,
+          user.fullname,
+          user.emailid,
+          user.mobileno,
+          user.roleid === 3 ? "User" : "Admin",
+          user.createdby,
+          <Button variant="outlined">
+            <Link
+              style={{
+                textDecoration: "none",
+              }}
+              to={`/viewusers/${user.loginid}/${user.roleid}`}
+            >
+              View
+            </Link>
+          </Button>
+        )
       )
     );
-  }
+
   const sortUser = (
     <React.Fragment>
       <Autocomplete
@@ -145,6 +146,25 @@ export default function ViewUsers() {
         renderInput={(params) => <TextField {...params} label="Type" />}
       />
     </React.Fragment>
+  );
+
+  const searchUser = (
+    <input
+      type="text"
+      name="search"
+      value={searchValue}
+      style={{
+        border: "1px solid #ccc",
+        borderRadius: " 4px",
+        width: "20rem",
+        height: "2rem",
+        float: "right",
+        maxWidth: "100%",
+        marginBottom: "2rem",
+      }}
+      placeholder="Search..."
+      onChange={searchValueHandler}
+    />
   );
   return (
     <React.Fragment>
@@ -181,6 +201,7 @@ export default function ViewUsers() {
         }}
       >
         <Card>
+          {searchUser}
           {localStorage.getItem("roleid") === "1" && sortUser}
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 440 }}>

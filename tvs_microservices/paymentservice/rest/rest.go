@@ -18,14 +18,14 @@ func NewPaymentController(paymentService model.PaymentService) *paymentControlle
 		paymentService: paymentService,
 	}
 }
-func (c *paymentController) MakePayment(ctx *gin.Context) {
+func (c *paymentController) MakePayment(context *gin.Context) {
 	var paymentDTO model.Paymentdto
-	errDTO := ctx.ShouldBind(&paymentDTO)
+	errDTO := context.ShouldBind(&paymentDTO)
 	if errDTO != nil {
 		data := utils.BadRequest()
 		data.Message = errDTO.Error()
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	} else {
 		paymentcreated, err := c.paymentService.MakePayment(paymentDTO)
@@ -33,11 +33,12 @@ func (c *paymentController) MakePayment(ctx *gin.Context) {
 			data := utils.NotFound(8)
 			data.Message = err.Error()
 			response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-			ctx.JSON(http.StatusBadRequest, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			data := utils.Created(3)
 			response := utils.BuildResponse(data.Message, data.Code, paymentcreated)
-			ctx.JSON(http.StatusCreated, response)
+			context.JSON(http.StatusCreated, response)
 		}
 
 	}
@@ -56,7 +57,8 @@ func (c *paymentController) GetAllPayments(context *gin.Context) {
 	if err != nil {
 		data := utils.NotFound(8)
 		response := utils.BuildResponse(data.Message, data.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.JSON(http.StatusNotFound, response)
+		return
 	} else {
 		data := utils.OK(4)
 		response := utils.BuildResponse(data.Message, data.Code, userpayment)
