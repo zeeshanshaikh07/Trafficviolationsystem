@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -40,19 +41,38 @@ func AuthorizeRequest(c *gin.Context, srv model.RegistrationService) bool {
 
 func (ctrl sRegistrationcontroller) VehicleSummary(c *gin.Context) {
 	vno := c.Param("vno")
-	obj, err := ctrl.srv.GetVehicleSummary(vno)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Server error": err})
+
+	if len(vno) == 0 {
+		utils.BuildRes(utils.ErrInvalidRequestParam, "vehicle summary", nil, fmt.Errorf("param %s", vno), c)
+		c.Abort()
 	}
 
-	c.JSON(http.StatusOK, gin.H{"Summary": obj})
+	if !AuthorizeRequest(c, ctrl.srv) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"Error": "Authorization failed!",
+		})
+		return
+	}
+
+	obj, err := ctrl.srv.GetVehicleSummary(vno)
+	utils.BuildRes(err, "vehicle summary", obj, err, c)
 }
 
 func (ctrl sRegistrationcontroller) VehicleRegistration(c *gin.Context) {
 	var isConsolidated int
-	isConsolidated, _ = strconv.Atoi(c.DefaultQuery("isconsolidated", "0"))
+	isConsolidated, err := strconv.Atoi(c.DefaultQuery("isconsolidated", "0"))
+
+	if err != nil {
+		utils.BuildRes(err, "Registration", nil, err, c)
+		return
+	}
+
 	vno := c.Query("vehicleregno")
+
+	if len(vno) == 0 {
+		utils.BuildRes(utils.ErrInvalidRequestParam, "Registration", nil, fmt.Errorf("param %s", vno), c)
+		return
+	}
 
 	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -63,28 +83,20 @@ func (ctrl sRegistrationcontroller) VehicleRegistration(c *gin.Context) {
 
 	if isConsolidated == 1 {
 		obj, err := ctrl.srv.GetVehicleSummary(vno)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"Server error": err})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"Summary": obj})
+		utils.BuildRes(err, "Registration", obj, err, c)
 		return
 	}
 
 	obj, err := ctrl.srv.GetVehicleRegistration(vno)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Server error": err})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"Registration": obj})
+	utils.BuildRes(err, "Registration", obj, err, c)
 }
 
 func (ctrl sRegistrationcontroller) VehicleInsurance(c *gin.Context) {
+	vno := c.Query("vehicleregno")
+	if len(vno) == 0 {
+		utils.BuildRes(utils.ErrInvalidRequestParam, "vehicle summary", nil, fmt.Errorf("param %s", vno), c)
+		return
+	}
 
 	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -93,16 +105,17 @@ func (ctrl sRegistrationcontroller) VehicleInsurance(c *gin.Context) {
 		return
 	}
 
-	vno := c.Query("vehicleregno")
 	obj, err := ctrl.srv.GetVehicleInsurance(vno)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Server error": err})
-	}
-	c.JSON(http.StatusOK, gin.H{"Insurance": obj})
+	utils.BuildRes(err, "Insurance", obj, err, c)
 }
 
 func (ctrl sRegistrationcontroller) VehiclePuc(c *gin.Context) {
+	vno := c.Query("vehicleregno")
+	if len(vno) == 0 {
+		utils.BuildRes(utils.ErrInvalidRequestParam, "vehicle summary", nil, fmt.Errorf("param %s", vno), c)
+		return
+	}
+
 	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"Error": "Authorization failed!",
@@ -110,16 +123,18 @@ func (ctrl sRegistrationcontroller) VehiclePuc(c *gin.Context) {
 		return
 	}
 
-	vno := c.Query("vehicleregno")
 	obj, err := ctrl.srv.GetVehiclePuc(vno)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Server error": err})
-	}
-	c.JSON(http.StatusOK, gin.H{"Puc": obj})
+	utils.BuildRes(err, "PUC", obj, err, c)
 }
 
 func (ctrl sRegistrationcontroller) VehicleInfo(c *gin.Context) {
+
+	vno := c.Param("vehicleregno")
+	if len(vno) == 0 {
+		utils.BuildRes(utils.ErrInvalidRequestParam, "vehicle summary", nil, fmt.Errorf("param %s", vno), c)
+		return
+	}
+
 	if !AuthorizeRequest(c, ctrl.srv) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"Error": "Authorization failed!",
@@ -127,11 +142,6 @@ func (ctrl sRegistrationcontroller) VehicleInfo(c *gin.Context) {
 		return
 	}
 
-	vno := c.Param("vno")
 	obj, err := ctrl.srv.GetVehicleDetails(vno)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Server error": err})
-	}
-	c.JSON(http.StatusOK, gin.H{"VehicleDetails": obj})
+	utils.BuildRes(err, "VehicleDetails", obj, err, c)
 }
