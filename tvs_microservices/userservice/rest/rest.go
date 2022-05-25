@@ -11,8 +11,6 @@ import (
 
 	"github.com/KadirSheikh/tvs_utils/utils"
 
-	"github.com/dgrijalva/jwt-go"
-
 	"github.com/gin-gonic/gin"
 
 	"github.com/go-resty/resty/v2"
@@ -30,13 +28,13 @@ func NewUserController(userService model.UserService, jwtToken utils.JWT) *userC
 	}
 }
 
-func (c *userController) Login(ctx *gin.Context) {
+func (c *userController) Login(context *gin.Context) {
 	var loginDTO model.LoginDTO
-	errDTO := ctx.ShouldBind(&loginDTO)
+	errDTO := context.ShouldBind(&loginDTO)
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 	userResult := c.userService.VerifyCredential(loginDTO.Loginid, loginDTO.Password)
@@ -45,45 +43,48 @@ func (c *userController) Login(ctx *gin.Context) {
 		generatedToken := c.jwt.GenerateToken(v.Userid, v.Loginid, v.Roleid)
 		v.Token = generatedToken
 		response := utils.BuildResponse(res.Message, res.Code, v)
-		ctx.JSON(http.StatusOK, response)
+		context.JSON(http.StatusOK, response)
 		return
 	}
 	res := utils.Unauthorized(1)
 	response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-	ctx.AbortWithStatusJSON(http.StatusUnauthorized, response)
+	context.AbortWithStatusJSON(http.StatusUnauthorized, response)
 }
 
-func (c *userController) Register(ctx *gin.Context) {
+func (c *userController) Register(context *gin.Context) {
 	var registerDTO model.RegisterDTO
-	errDTO := ctx.ShouldBind(&registerDTO)
+	errDTO := context.ShouldBind(&registerDTO)
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if !c.userService.IsDuplicateUsername(registerDTO.Loginid) {
 		res := utils.Conflict(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		ctx.JSON(http.StatusConflict, response)
+		context.AbortWithStatusJSON(http.StatusConflict, response)
+		return
 	} else if !c.userService.IsDuplicateEmail(registerDTO.Emailid) {
 		res := utils.Conflict(1)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		ctx.JSON(http.StatusConflict, response)
+		context.AbortWithStatusJSON(http.StatusConflict, response)
+		return
 	} else {
 
 		createdUser, err := c.userService.RegisterUser(registerDTO)
 		if err != nil {
 			res := utils.BadRequest()
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			ctx.JSON(http.StatusBadRequest, response)
+			context.AbortWithStatusJSON(http.StatusBadRequest, response)
+			return
 		} else {
 			res := utils.Created(0)
 			token := c.jwt.GenerateToken(createdUser.Userid, createdUser.Loginid, createdUser.Roleid)
 			createdUser.Token = token
 			response := utils.BuildResponse(res.Message, res.Code, createdUser)
-			ctx.JSON(http.StatusCreated, response)
+			context.JSON(http.StatusCreated, response)
 		}
 
 	}
@@ -96,26 +97,10 @@ func (c *userController) AddVehicle(context *gin.Context) {
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	} else if !c.userService.IsDuplicateVehicleRegNo(userVehicleDTO.Regno) {
-		res := utils.Conflict(2)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusConflict, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
 	} else {
-		authHeader := context.GetHeader("Authorization")
-		token, errToken := c.jwt.ValidateToken(authHeader)
-		if errToken != nil {
-			res := utils.BadRequest()
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
-		}
-		claims := token.Claims.(jwt.MapClaims)
-		userid, err := strconv.ParseUint(fmt.Sprintf("%v", claims["userid"]), 10, 64)
-		if err != nil {
-			res := utils.NotFound(0)
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
-		}
+		userid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Userid)), 10, 64)
 		if err == nil {
 			userVehicleDTO.Userid = userid
 		}
@@ -134,16 +119,17 @@ func (c *userController) AddVehicle(context *gin.Context) {
 
 		if err != nil {
 			fmt.Println("code : ", utils.StatusCodes[utils.ErrInvalidAuthorizeHeader], utils.ErrInvalidAuthorizeHeader)
-
+			return
 		}
 
 		if resp.StatusCode() == http.StatusOK {
 			result, err := c.userService.AddVehicle(userVehicleDTO)
 
 			if err != nil {
-				res := utils.BadRequest()
+				res := utils.Conflict(2)
 				response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-				context.JSON(http.StatusBadRequest, response)
+				context.AbortWithStatusJSON(http.StatusConflict, response)
+				return
 			} else {
 				result.Vtoken = vToken
 				res := utils.Created(1)
@@ -153,7 +139,8 @@ func (c *userController) AddVehicle(context *gin.Context) {
 		} else {
 
 			response := utils.BuildResponse("Invalid Vehicle", resp.StatusCode(), utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
+			context.AbortWithStatusJSON(http.StatusBadRequest, response)
+			return
 		}
 
 	}
@@ -168,7 +155,8 @@ func (c *userController) AllVehicles(context *gin.Context) {
 		if err != nil {
 			res := utils.NotFound(5)
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			res := utils.OK(4)
 			response := utils.BuildResponse(res.Message, res.Code, uservehicles)
@@ -179,7 +167,8 @@ func (c *userController) AllVehicles(context *gin.Context) {
 		if err != nil {
 			res := utils.NotFound(5)
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			res := utils.OK(4)
 			response := utils.BuildResponse(res.Message, res.Code, uservehicles)
@@ -195,39 +184,20 @@ func (c *userController) DeleteVehicle(context *gin.Context) {
 	if regno == "" {
 		res := utils.NotFound(2)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 	vehicle.Regno = regno
-	userid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Userid)), 10, 64)
-	if err != nil {
-		res := utils.NotFound(0)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
 
-	result, err := c.userService.IsAllowedToUpdateDelete(userid, vehicle.Regno)
-
-	if err != nil {
-		res := utils.BadRequest()
+	if c.userService.DeleteUserVehicle(vehicle) != nil {
+		res := utils.NotFound(5)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
-		if result {
-			if c.userService.DeleteUserVehicle(vehicle) != nil {
-				res := utils.BadRequest()
-				response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-				context.JSON(http.StatusBadRequest, response)
-			} else {
-				res := utils.OK(2)
-				response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-				context.JSON(http.StatusOK, response)
-			}
-		} else {
-			res := utils.Unauthorized(0)
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusUnauthorized, response)
-		}
-
+		res := utils.OK(2)
+		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
+		context.JSON(http.StatusOK, response)
 	}
 
 }
@@ -241,7 +211,8 @@ func (c *userController) UserDetails(context *gin.Context) {
 		if err != nil {
 			res := utils.NotFound(1)
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			res := utils.OK(4)
 			response := utils.BuildResponse(res.Message, res.Code, user)
@@ -252,7 +223,8 @@ func (c *userController) UserDetails(context *gin.Context) {
 		if err != nil {
 			res := utils.NotFound(1)
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusNotFound, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			res := utils.OK(4)
 			response := utils.BuildResponse(res.Message, res.Code, user)
@@ -265,16 +237,18 @@ func (c *userController) UserDetails(context *gin.Context) {
 func (c *userController) GetVToken(context *gin.Context) {
 	vehregno := context.Query("vehregno")
 	if vehregno == "" {
-		res := utils.BadRequest()
+		res := utils.NotFound(2)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 
 	chassisno := context.Query("chassisno")
 	if chassisno == "" {
-		res := utils.BadRequest()
+		res := utils.NotFound(2)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 
 	vToken := c.jwt.GenerateServiceValidationToken(chassisno, vehregno)
@@ -289,7 +263,8 @@ func (c *userController) AddAddress(context *gin.Context) {
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
 	} else {
 		loginid := fmt.Sprintf("%v", context.MustGet(middleware.Loginid))
 
@@ -299,7 +274,8 @@ func (c *userController) AddAddress(context *gin.Context) {
 		if err != nil {
 			res := utils.BadRequest()
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
+			context.AbortWithStatusJSON(http.StatusBadRequest, response)
+			return
 		} else {
 			res := utils.Created(2)
 			response := utils.BuildResponse(res.Message, res.Code, address)
@@ -318,7 +294,8 @@ func (c *userController) GetAddress(context *gin.Context) {
 		if err != nil {
 			res := utils.NotFound(4)
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			res := utils.OK(3)
 			response := utils.BuildResponse(res.Message, res.Code, address)
@@ -329,7 +306,8 @@ func (c *userController) GetAddress(context *gin.Context) {
 		if err != nil {
 			res := utils.NotFound(4)
 			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusBadRequest, response)
+			context.AbortWithStatusJSON(http.StatusNotFound, response)
+			return
 		} else {
 			res := utils.OK(3)
 			response := utils.BuildResponse(res.Message, res.Code, address)
@@ -344,14 +322,16 @@ func (c *userController) GetAllUsers(context *gin.Context) {
 	if err != nil {
 		res := utils.NotFound(6)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 
 	users, err := c.userService.GetAllUser(roleid)
 	if err != nil {
 		res := utils.NotFound(1)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
 		res := utils.OK(4)
 		response := utils.BuildResponse(res.Message, res.Code, users)
@@ -375,63 +355,12 @@ func (c *userController) ResetPassword(context *gin.Context) {
 	if err != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
 	} else {
 		res := utils.OK(3)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
 		context.JSON(http.StatusCreated, response)
-	}
-
-}
-
-func (c *userController) UpdateVehicle(context *gin.Context) {
-	var vehicleUpdateDTO model.UservehiclesupdateDTO
-	vehicleregno := context.Param("vehicleregno")
-	if vehicleregno == "" {
-		res := utils.NotFound(2)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.AbortWithStatusJSON(http.StatusBadRequest, response)
-		return
-	}
-	userid, err := strconv.ParseUint(fmt.Sprintf("%v", context.MustGet(middleware.Userid)), 10, 64)
-	if err != nil {
-		res := utils.NotFound(0)
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	}
-	vehicleUpdateDTO.Userid = userid
-	errDTO := context.ShouldBind(&vehicleUpdateDTO)
-	if errDTO != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	result, err := c.userService.IsAllowedToUpdateDelete(userid, vehicleregno)
-
-	if err != nil {
-		res := utils.BadRequest()
-		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
-	} else {
-		if result {
-			vehicle, err := c.userService.UpdateUserVehicle(vehicleUpdateDTO, vehicleregno)
-			if err != nil {
-				res := utils.NotFound(5)
-				response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-				context.JSON(http.StatusBadRequest, response)
-			} else {
-				res := utils.OK(1)
-				response := utils.BuildResponse(res.Message, res.Code, vehicle)
-				context.JSON(http.StatusOK, response)
-			}
-		} else {
-			res := utils.Unauthorized(0)
-			response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-			context.JSON(http.StatusUnauthorized, response)
-		}
-
 	}
 
 }
@@ -444,7 +373,8 @@ func (c *userController) UpdateUserDetails(context *gin.Context) {
 	if err != nil {
 		res := utils.NotFound(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 	userUpdatedto.Userid = userid
 
@@ -452,7 +382,8 @@ func (c *userController) UpdateUserDetails(context *gin.Context) {
 	if err != nil {
 		res := utils.NotFound(6)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 
 	userUpdatedto.Roleid = roleid
@@ -461,7 +392,7 @@ func (c *userController) UpdateUserDetails(context *gin.Context) {
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -470,7 +401,8 @@ func (c *userController) UpdateUserDetails(context *gin.Context) {
 	if err != nil {
 		res := utils.NotFound(1)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
 		token := c.jwt.GenerateToken(user.Userid, user.Loginid, user.Roleid)
 		user.Token = token
@@ -486,14 +418,15 @@ func (c *userController) UpdateUserAddress(context *gin.Context) {
 	if err != nil {
 		res := utils.NotFound(2)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	}
 
 	errDTO := context.ShouldBind(&updateUseraddressdto)
 	if errDTO != nil {
 		res := utils.BadRequest()
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -501,7 +434,8 @@ func (c *userController) UpdateUserAddress(context *gin.Context) {
 	if err != nil {
 		res := utils.NotFound(0)
 		response := utils.BuildResponse(res.Message, res.Code, utils.EmptyObj{})
-		context.JSON(http.StatusBadRequest, response)
+		context.AbortWithStatusJSON(http.StatusNotFound, response)
+		return
 	} else {
 		res := utils.OK(1)
 		response := utils.BuildResponse(res.Message, res.Code, address)

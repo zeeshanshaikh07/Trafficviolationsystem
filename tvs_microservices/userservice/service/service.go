@@ -140,16 +140,6 @@ func (service *userService) ResetPassword(logindto model.LoginDTO) error {
 	return errors.New("no record for given creds")
 }
 
-func (service *userService) UpdateUserVehicle(vehicle model.UservehiclesupdateDTO, vehregno string) (model.Uservehicles, error) {
-	vehicleToUpdate := model.Uservehicles{}
-	err := smapping.FillStruct(&vehicleToUpdate, smapping.MapFields(&vehicle))
-	if err != nil {
-		log.Fatalf("Failed map %v:", err)
-	}
-	return service.userRepository.UpdateUserVehicle(vehicleToUpdate, vehregno)
-
-}
-
 func (service *userService) UpdateUserDetails(user model.UpdateuserDTO, loginid string) (model.User, error) {
 	userToUpdate := model.User{}
 	err := smapping.FillStruct(&userToUpdate, smapping.MapFields(&user))

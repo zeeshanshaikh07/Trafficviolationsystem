@@ -63,6 +63,7 @@ export default function ViewPayments() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState();
   const [isPayEmpty, setIsUserEmpty] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
 
   const params = useParams();
   const { loginid } = params;
@@ -86,26 +87,28 @@ export default function ViewPayments() {
     });
   }, [loginid]);
 
+  const searchValueHandler = (event) => {
+    setSearchValue(event.target.value);
+  };
+
   const rows = [];
 
-  for (const key in payments) {
-    let status;
-    if (payments[key].transactionstatus === 0) {
-      status = "Failed";
-    } else {
-      status = "Success";
-    }
-    rows.push(
-      createData(
-        payments[key].vehicleregno,
-        status,
-        payments[key].violationname,
-        payments[key].amount,
-        payments[key].paymentmode,
-        FormatDate(payments[key].transactiondate)
+  payments
+    .filter((payment) =>
+      payment.vehicleregno.match(new RegExp(searchValue, "i"))
+    )
+    .map((payment) =>
+      rows.push(
+        createData(
+          payment.vehicleregno,
+          payment.transactionstatus === 0 ? "Failed" : "Success",
+          payment.violationname,
+          payment.amount,
+          payment.paymentmode,
+          FormatDate(payment.transactiondate)
+        )
       )
     );
-  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -116,10 +119,30 @@ export default function ViewPayments() {
     setPage(0);
   };
 
+  const searchPayment = (
+    <input
+      type="text"
+      name="search"
+      value={searchValue}
+      style={{
+        border: "1px solid #ccc",
+        borderRadius: " 4px",
+        width: "20rem",
+        height: "2rem",
+        float: "right",
+        maxWidth: "100%",
+        marginBottom: "2rem",
+      }}
+      placeholder="Search..."
+      onChange={searchValueHandler}
+    />
+  );
+
   return (
     <React.Fragment>
       <Topbar>User Payment</Topbar>
       <Card>
+        {searchPayment}
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table">

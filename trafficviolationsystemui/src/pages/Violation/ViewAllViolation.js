@@ -19,6 +19,9 @@ import classes from "../../assets/Styling/Auth.module.css";
 import useInput from "../../hooks/use-input";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import IconButton from "@mui/material/IconButton";
 
 function createData(
   violationid,
@@ -51,6 +54,8 @@ export default function Violation() {
   const [value, setValue] = React.useState(options[0]);
   const [inputValue, setInputValue] = React.useState("");
   const [isViolationEmpty, setIsViolationEmpty] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [displaySearch, setDisplaySearch] = React.useState(false);
 
   const {
     value: filtervalue,
@@ -62,6 +67,7 @@ export default function Violation() {
   } = useInput((value) => value.trim() !== "");
 
   const handleSubmit = async (event) => {
+    setDisplaySearch(true);
     event.preventDefault();
     setIsLoading(true);
     if (!filtervalueIsValid) {
@@ -103,6 +109,15 @@ export default function Violation() {
             cursor: "pointer",
           }}
         >
+          <TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
           <TableCell>{row.regnumber}</TableCell>
           <TableCell>{row.violationname}</TableCell>
           <TableCell>{row.violationdate}</TableCell>
@@ -120,7 +135,7 @@ export default function Violation() {
               style={{
                 backgroundColor: "#313082",
                 color: "#FFFFFF",
-                width: "115%",
+                width: "125%",
               }}
             >
               <Box sx={{ margin: 1 }}>
@@ -185,30 +200,30 @@ export default function Violation() {
     );
   }
 
+  const searchValueHandler = (event) => {
+    setSearchValue(event.target.value);
+  };
   const rows = [];
 
-  for (const key in violations) {
-    let status;
-    if (violations[key].status === 1) {
-      status = "Closed";
-    } else {
-      status = "Open";
-    }
-
-    rows.push(
-      createData(
-        violations[key].violationid,
-        violations[key].regnumber,
-        violations[key].violationname,
-        FormatDate(violations[key].violationdate),
-        violations[key].charge,
-        status,
-        violations[key].city,
-        violations[key].state,
-        violations[key].violationdetails
+  violations
+    .filter((violation) =>
+      violation.regnumber.match(new RegExp(searchValue, "i"))
+    )
+    .map((violation) =>
+      rows.push(
+        createData(
+          violation.violationid,
+          violation.regnumber,
+          violation.violationname,
+          FormatDate(violation.violationdate),
+          violation.charge,
+          violation.status === 1 ? "Closed" : "Open",
+          violation.city,
+          violation.state,
+          violation.violationdetails
+        )
       )
     );
-  }
 
   const searchNSort = (
     <React.Fragment>
@@ -265,13 +280,31 @@ export default function Violation() {
       </Box>
     </React.Fragment>
   );
+
+  const searchViolation = (
+    <input
+      type="text"
+      name="search"
+      value={searchValue}
+      style={{
+        border: "1px solid #ccc",
+        borderRadius: " 4px",
+        width: "20rem",
+        height: "2rem",
+        float: "right",
+        maxWidth: "100%",
+      }}
+      placeholder="Search Vehicle Reg No..."
+      onChange={searchValueHandler}
+    />
+  );
   return (
     <React.Fragment>
       <Topbar>View Violations</Topbar>
 
       <Card>
         {searchNSort}
-
+        {displaySearch && searchViolation}
         <TableContainer
           style={{
             marginTop: "50px",
@@ -281,6 +314,7 @@ export default function Violation() {
           <Table aria-label="collapsible table">
             <TableHead>
               <TableRow>
+                <TableCell></TableCell>
                 <TableCell
                   style={{
                     fontWeight: "800",

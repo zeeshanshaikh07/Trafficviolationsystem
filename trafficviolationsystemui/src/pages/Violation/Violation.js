@@ -56,6 +56,7 @@ export default function Violation() {
   const [date, setDate] = React.useState("");
   const [tvsid, setTvsid] = React.useState("");
   const [regno, setRegno] = React.useState("");
+  const [searchValue, setSearchValue] = React.useState("");
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState();
@@ -225,24 +226,50 @@ export default function Violation() {
     );
   }
 
+  const searchValueHandler = (event) => {
+    setSearchValue(event.target.value);
+  };
   const rows = [];
 
-  for (const key in violations) {
-    rows.push(
-      createData(
-        violations[key].violationid,
-        violations[key].regnumber,
-        violations[key].violationname,
-        FormatDate(violations[key].violationdate),
-        violations[key].charge,
-        violations[key].city,
-        violations[key].state,
-        violations[key].violationdetails
+  violations
+    .filter((violation) =>
+      violation.regnumber.match(new RegExp(searchValue, "i"))
+    )
+    .map((violation) =>
+      rows.push(
+        createData(
+          violation.violationid,
+          violation.regnumber,
+          violation.violationname,
+          FormatDate(violation.violationdate),
+          violation.charge,
+          violation.city,
+          violation.state,
+          violation.violationdetails
+        )
       )
     );
-  }
 
-  const searchNSort = (
+  const searchViolation = (
+    <input
+      type="text"
+      name="search"
+      value={searchValue}
+      style={{
+        border: "1px solid #ccc",
+        borderRadius: " 4px",
+        width: "20rem",
+        height: "2rem",
+        float: "right",
+        maxWidth: "100%",
+        marginTop: "-3.5rem",
+      }}
+      placeholder="Search..."
+      onChange={searchValueHandler}
+    />
+  );
+
+  const sortViolation = (
     <React.Fragment>
       <Autocomplete
         value={value}
@@ -288,7 +315,8 @@ export default function Violation() {
       </Modal>
 
       <Card>
-        {searchNSort}
+        {sortViolation}
+        {searchViolation}
         <TableContainer
           style={{
             marginTop: "50px",

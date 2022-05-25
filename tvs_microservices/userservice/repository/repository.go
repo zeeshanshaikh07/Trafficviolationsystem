@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"trafficviolationsystem/userservice/model"
 
@@ -22,6 +23,7 @@ func NewUserRepository(db *gorm.DB) *userConnection {
 func (db *userConnection) AddUser(user model.User) (model.User, error) {
 	user.Password = hashAndSalt([]byte(user.Password))
 	res := db.connection.Save(&user)
+
 	return user, res.Error
 
 }
@@ -68,8 +70,10 @@ func (db *userConnection) GetVehicles(loginid string) ([]model.Uservehicles, err
 	var userVehicles []model.Uservehicles
 
 	resFind := db.connection.Where("loginid = ?", loginid).Take(&userVehicles)
+
 	if resFind.Error == nil {
 		res := db.connection.Where("loginid = ?", loginid).Find(&userVehicles)
+
 		return userVehicles, res.Error
 	}
 	return userVehicles, resFind.Error
@@ -78,13 +82,14 @@ func (db *userConnection) GetVehicles(loginid string) ([]model.Uservehicles, err
 func (db *userConnection) DeleteUserVehicle(vehicle model.Uservehicles) error {
 
 	resFind := db.connection.Where("regno = ?", vehicle.Regno).Take(&vehicle)
+	fmt.Println(resFind.Error)
 	if resFind.Error == nil {
 		resDelete := db.connection.Where("regno = ?", vehicle.Regno).Delete(&vehicle)
+
 		if resDelete.Error != nil {
 			return resDelete.Error
 		}
 	}
-
 	return resFind.Error
 
 }
@@ -145,13 +150,6 @@ func (db *userConnection) ResetPassword(logindto model.LoginDTO) error {
 	}
 
 	return nil
-}
-
-func (db *userConnection) UpdateUserVehicle(vehicle model.Uservehicles, vehregno string) (model.Uservehicles, error) {
-
-	resFind := db.connection.Where("regno = ?", vehregno).Updates(&vehicle)
-	return vehicle, resFind.Error
-
 }
 
 func (db *userConnection) UpdateUserDetails(user model.User, loginid string) (model.User, error) {
