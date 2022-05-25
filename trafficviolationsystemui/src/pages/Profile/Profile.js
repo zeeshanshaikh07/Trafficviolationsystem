@@ -13,23 +13,29 @@ const theme = createTheme();
 
 export default function Profile() {
   const [addressdata, setAddressdata] = React.useState([]);
+  const [isaddAdded, setIsaddAdded] = React.useState(false);
 
   React.useEffect(() => {
-    async function fetchVehicleData() {
+    async function fetchAddressData() {
       await getAddress().then((data) => {
         if (data.length !== 0) {
           setAddressdata(data);
+          if (data.length === 2) {
+            setIsaddAdded(true);
+          } else {
+            setIsaddAdded(false);
+          }
         }
       });
     }
-    fetchVehicleData().catch((err) => {});
+    fetchAddressData().catch((err) => {});
   }, []);
 
   return (
     <Fragment>
       <ThemeProvider theme={theme}>
         <Topbar>User Profile</Topbar>
-        {localStorage.getItem("roleid") === "3" && (
+        {localStorage.getItem("roleid") === "3" && !isaddAdded && (
           <Button
             style={{
               backgroundColor: "#313082",

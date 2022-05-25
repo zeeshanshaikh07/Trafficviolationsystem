@@ -18,6 +18,7 @@ import Select from "@mui/material/Select";
 import { addAddress } from "../../libs/api";
 import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
+import { getAddress } from "../../libs/api";
 
 const theme = createTheme();
 
@@ -25,6 +26,7 @@ export default function AddAddress(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [success, setSuccess] = React.useState("");
   const [error, setError] = React.useState("");
+  const [type, setType] = React.useState("");
 
   const [age, setAge] = React.useState("");
 
@@ -33,6 +35,21 @@ export default function AddAddress(props) {
   const handleChange = (event) => {
     setAge(event.target.value);
   };
+
+  React.useEffect(() => {
+    async function fetchAddressData() {
+      await getAddress().then((data) => {
+        if (data.length === 0) {
+          setType("Both");
+        } else if (data.length > 0) {
+          data.map((d) => setType(d.addresstype));
+        }
+      });
+    }
+    fetchAddressData().catch((err) => {});
+  }, []);
+
+  console.log("TYPE", type);
 
   const {
     value: housenum,
@@ -237,7 +254,6 @@ export default function AddAddress(props) {
 
               <Grid item xs={4}>
                 <TextField
-                  //InputLabelProps={{ shrink: true }}
                   value={state}
                   onChange={stateInputChangeHandler}
                   onBlur={stateInputBlurHandler}
@@ -255,18 +271,52 @@ export default function AddAddress(props) {
                 <Box sx={{ minWidth: 120 }}>
                   <FormControl fullWidth>
                     <InputLabel id="addtype">Type</InputLabel>
-                    <Select
-                      labelId="addtype"
-                      id="addresstype"
-                      name="addresstype"
-                      value={age}
-                      label="Type"
-                      size="small"
-                      onChange={handleChange}
-                    >
-                      <MenuItem value="Permanent">Permanent</MenuItem>
-                      <MenuItem value="Correspondence">Correspondence</MenuItem>
-                    </Select>
+                    {type === "Both" && (
+                      <Select
+                        labelId="addtype"
+                        id="addresstype"
+                        name="addresstype"
+                        value={age}
+                        label="Type"
+                        size="small"
+                        onChange={handleChange}
+                      >
+                        <MenuItem value="Permanent">Permanent</MenuItem>
+                        <MenuItem value="Correspondence">
+                          Correspondence
+                        </MenuItem>
+                      </Select>
+                    )}
+
+                    {type === "Permanent" && (
+                      <Select
+                        labelId="addtype"
+                        id="addresstype"
+                        name="addresstype"
+                        value={age}
+                        label="Type"
+                        size="small"
+                        onChange={handleChange}
+                      >
+                        <MenuItem value="Correspondence">
+                          Correspondence
+                        </MenuItem>
+                      </Select>
+                    )}
+
+                    {type === "Correspondence" && (
+                      <Select
+                        labelId="addtype"
+                        id="addresstype"
+                        name="addresstype"
+                        value={age}
+                        label="Type"
+                        size="small"
+                        onChange={handleChange}
+                      >
+                        <MenuItem value="Permanent">Permanent</MenuItem>
+                      </Select>
+                    )}
                   </FormControl>
                 </Box>
               </Grid>
