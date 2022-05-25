@@ -1,5 +1,5 @@
 import * as React from "react";
-import { getAllViolations } from "../../libs/api";
+import { getAllViolations, getAllDefaultViolations } from "../../libs/api";
 import Topbar from "../../layouts/Topbar/Topbar";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
@@ -47,7 +47,7 @@ function createData(
     violationdetails: [details],
   };
 }
-const options = ["city", "state"];
+const options = ["state", "city"];
 export default function Violation() {
   const [violations, setViolations] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -68,6 +68,25 @@ export default function Violation() {
     inputChangeHander: filtervalueInputChangeHander,
     inputBlurHandler: filtervalueInputBlurHandler,
   } = useInput((value) => value.trim() !== "");
+
+  React.useEffect(() => {
+    async function fetchVehicleData() {
+      await getAllDefaultViolations().then((data) => {
+        if (data.length !== 0) {
+          setViolations(data);
+          setIsViolationEmpty(false);
+        } else {
+          setIsViolationEmpty(true);
+        }
+
+        setIsLoading(false);
+      });
+    }
+    fetchVehicleData().catch((err) => {
+      setIsLoading(false);
+      setError("Failed to fetch violations");
+    });
+  }, []);
 
   const handleSubmit = async (event) => {
     setDisplaySearch(true);

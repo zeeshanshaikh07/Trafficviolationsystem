@@ -473,3 +473,44 @@ export async function getAllViolations(filter, value) {
 
   return loadedViolations;
 }
+
+export async function getAllDefaultViolations() {
+  let loadedViolations = [];
+
+  const response = await fetch(
+    `${ROOT_ROUTE_VIOLATIONS}/mode?filter=state&value=Maharashtra`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token"),
+      },
+    }
+  );
+
+  const resData = await response.json();
+
+  if (resData.status_code === 200) {
+    resData.data.map((item) =>
+      loadedViolations.push({
+        violationid: item.violationlistid,
+        regnumber: item.vehicleregno,
+        city: item.city,
+        status: item.isclose,
+        violationname: item.violationdetails.name,
+        violationdate: item.createdat,
+        state: item.state,
+        charge: item.violationdetails.charge,
+        violationdetails: {
+          violationcode: item.violationdetails.code,
+          longitude: item.longitude,
+          latitude: item.latitude,
+          device: item.devicetype,
+          description: item.violationdetails.description,
+        },
+      })
+    );
+  }
+
+  return loadedViolations;
+}

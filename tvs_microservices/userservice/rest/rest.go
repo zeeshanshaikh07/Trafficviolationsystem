@@ -138,7 +138,7 @@ func (c *userController) AddVehicle(context *gin.Context) {
 			}
 		} else {
 
-			response := utils.BuildResponse("Invalid Vehicle", resp.StatusCode(), utils.EmptyObj{})
+			response := utils.BuildResponse("This vehicle is not registered in the system.", resp.StatusCode(), utils.EmptyObj{})
 			context.AbortWithStatusJSON(http.StatusBadRequest, response)
 			return
 		}
