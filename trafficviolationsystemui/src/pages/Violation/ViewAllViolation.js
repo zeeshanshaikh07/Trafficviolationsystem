@@ -22,6 +22,7 @@ import Grid from "@mui/material/Grid";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
+import TablePagination from "@mui/material/TablePagination";
 
 function createData(
   violationid,
@@ -56,6 +57,8 @@ export default function Violation() {
   const [isViolationEmpty, setIsViolationEmpty] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
   const [displaySearch, setDisplaySearch] = React.useState(false);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = React.useState(0);
 
   const {
     value: filtervalue,
@@ -94,6 +97,15 @@ export default function Violation() {
         setIsLoading(false);
         setError("Failed to fetch violations");
       });
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
   };
 
   function Row(props) {
@@ -209,6 +221,7 @@ export default function Violation() {
     .filter((violation) =>
       violation.regnumber.match(new RegExp(searchValue, "i"))
     )
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     .map((violation) =>
       rows.push(
         createData(
@@ -407,6 +420,15 @@ export default function Violation() {
             <p>No violation found.</p>
           </section>
         )}
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 20, 30, 40, 50]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
     </React.Fragment>
   );

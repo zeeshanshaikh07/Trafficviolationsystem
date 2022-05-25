@@ -58,7 +58,7 @@ function createData(
 
 export default function ViewPayments() {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [payments, setPayments] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState();
@@ -221,7 +221,7 @@ export default function ViewPayments() {
             </section>
           )}
           <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
+            rowsPerPageOptions={[5, 10, 20, 30, 40, 50]}
             component="div"
             count={rows.length}
             rowsPerPage={rowsPerPage}
