@@ -21,6 +21,7 @@ import FormatDate from "../../utils/FormatDate";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
+import TablePagination from "@mui/material/TablePagination";
 
 function createData(
   violationid,
@@ -57,7 +58,8 @@ export default function Violation() {
   const [tvsid, setTvsid] = React.useState("");
   const [regno, setRegno] = React.useState("");
   const [searchValue, setSearchValue] = React.useState("");
-
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [page, setPage] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState();
   const [isViolationEmpty, setIsViolationEmpty] = React.useState(false);
@@ -74,6 +76,15 @@ export default function Violation() {
   };
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
   };
 
   useEffect(() => {
@@ -235,6 +246,7 @@ export default function Violation() {
     .filter((violation) =>
       violation.regnumber.match(new RegExp(searchValue, "i"))
     )
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     .map((violation) =>
       rows.push(
         createData(
@@ -412,6 +424,15 @@ export default function Violation() {
             <p>No violation found.</p>
           </section>
         )}
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 20, 30, 40, 50]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Card>
     </React.Fragment>
   );

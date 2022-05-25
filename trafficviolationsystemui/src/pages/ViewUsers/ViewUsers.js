@@ -61,7 +61,7 @@ const options = ["Users", "Admins"];
 
 export default function ViewUsers() {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [users, setUsers] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState();
@@ -284,7 +284,7 @@ export default function ViewUsers() {
               </section>
             )}
             <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
+              rowsPerPageOptions={[5, 10, 20, 30, 40, 50]}
               component="div"
               count={rows.length}
               rowsPerPage={rowsPerPage}
